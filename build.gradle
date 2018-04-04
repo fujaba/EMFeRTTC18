@@ -1,0 +1,40 @@
+allprojects  {
+	group = 'de.tudresden.inf.st'
+	version = '1.0.0-SNAPSHOT'
+}
+
+subprojects {
+	apply plugin: 'java'
+	sourceCompatibility = 1.8
+	targetCompatibility = 1.8
+
+	task packageSources(type: Jar) {
+		classifier = 'sources'
+		from sourceSets.main.allSource
+	}
+
+	artifacts.archives packageSources
+
+	task longRunningTest(type: Test, description: 'Runs long running tests.', group: 'verification') {
+		outputs.upToDateWhen {false}
+		systemProperty "de.tudresden.inf.st.mquat.longRunningTest", "true"
+	}
+
+	configurations {
+		testArtifacts.extendsFrom testRuntime
+	}
+
+	task testJar(type: Jar) {
+		classifier "test"
+		from sourceSets.test.output
+	}
+
+	artifacts {
+		testArtifacts testJar
+	}
+
+	repositories {
+		maven { url "https://www.xypron.de/repository" }
+	}
+
+}

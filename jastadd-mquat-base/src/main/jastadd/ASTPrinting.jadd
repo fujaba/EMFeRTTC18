@@ -1,0 +1,43 @@
+/**
+ * contains a method to display a debug text output of the AST
+ */
+aspect ASTPrinting {
+
+  public String ASTNode.getASTString() {
+
+    String result = this.getClass().getSimpleName() + "\n";
+
+    for (java.lang.reflect.Method method : this.getClass().getMethods()) {
+      ASTNodeAnnotation.Token annotation = method.getAnnotation(ASTNodeAnnotation.Token.class);
+      if (annotation != null) {
+        try {
+          result += "|--" + annotation.name() + ": " + method.invoke(this);
+        } catch (IllegalAccessException e) {
+          e.printStackTrace();
+        } catch (java.lang.reflect.InvocationTargetException e) {
+          e.printStackTrace();
+        }
+        result += "\n";
+      }
+    }
+
+    for(int childIndex = 0; childIndex < getNumChildNoTransform(); childIndex++) {
+
+      ASTNode<?> child = getChildNoTransform(childIndex);
+      String childString = "NULL\n";
+      if(child != null) {
+        childString = child.getASTString();
+      }
+
+      if(childIndex < getNumChildNoTransform() - 1) {
+        childString = childString.replaceAll("(?m)^", "|  ");
+      } else {
+        childString = childString.replaceAll("(?m)^", "   ");
+      }
+
+      result += "|\n|--" + childString.substring(3);
+    }
+
+    return result;
+  }
+}

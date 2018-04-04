@@ -1,0 +1,64 @@
+aspect Checking {
+  public void Solution.explain() {
+    Set<Request> requestSet = new HashSet<>();
+    Map<Resource, Assignment> resourceSet = new HashMap<>();
+    logger.info(this.toString());
+    // check assignments
+    for (Assignment assignment : allAssignments()) {
+      if (!assignment.isValid()) {
+        logger.warn("Invalid assignment found");
+        assignment.explain();
+        return;
+      } else {
+        if (assignment.getImplementation().containingComponent() ==
+            assignment.getRequest().getTarget().getRef()) {
+          requestSet.add(assignment.getRequest());
+        }
+        if (resourceSet.containsKey(assignment.getResource())) {
+          logger.warn("Two assignments to the same resource found:\n {}---\n{}",
+              assignment.toString(), resourceSet.get(assignment.getResource()));
+          return;
+        }
+        resourceSet.put(assignment.getResource(), assignment);
+      }
+    }
+    // check if all requests have (at least) one assignment
+    if (requestSet.size() != getModel().getRequests().getNumChild()) {
+      logger.warn("There are only assignments for {} of {} requests!", requestSet.size(), getModel().getRequests().getNumChild());
+      return;
+    }
+    logger.info("Solution is valid");
+  }
+
+  public void Assignment.explain() {
+    if (getRequest() == null) {
+      logger.warn("incomplete assignment: request missing");
+      return;
+    } else if (getResource() == null) {
+      logger.warn("incomplete assignment: resource missing");
+      return;
+    } else if (getImplementation() == null) {
+      logger.warn("incomplete assignment: implementation missing");
+      return;
+    }
+
+    for (Clause clause : getImplementation().requirementClauses()) {
+      if (!clause.checkUsing(this)) {
+        logger.warn("Requirement {} of {} for {} not met",
+            clause.print(new MquatWriteSettings("")),
+            getImplementation().name(), this.name());
+      }
+    }
+
+    // if this is a "top-level" assignment, check the properties from the request
+    if (this.getRequest().getTarget().getRef().equals(getImplementation().containingComponent())) {
+      for (Clause clause : getRequest().getConstraintList()) {
+        if (clause.isRequiringClause() && !clause.checkUsing(this)) {
+          logger.warn("Request requirement {} of {} for {} not met",
+              clause.print(new MquatWriteSettings("")),
+              getRequest().name(), this.name());
+        }
+      }
+    }
+  }
+}

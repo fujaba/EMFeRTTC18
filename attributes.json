@@ -1,0 +1,194 @@
+{
+  "resolveProperty": {
+    "returntype": "Property", 
+    "kind": "syn", 
+    "args": "String name", 
+    "eqs": [
+      "Component"
+    ]
+  }, 
+  "isSoftwareDesignator": {
+    "returntype": "boolean", 
+    "kind": "syn", 
+    "args": "", 
+    "eqs": [
+      "Designator"
+    ]
+  }, 
+  "findPropertyByName": {
+    "returntype": "Property", 
+    "kind": "syn", 
+    "args": "String name", 
+    "eqs": [
+      "SoftwareModel"
+    ]
+  }, 
+  "asPropertyResourceDesignator": {
+    "returntype": "PropertyResourceDesignator", 
+    "kind": "syn", 
+    "args": "", 
+    "eqs": [
+      "Designator"
+    ]
+  }, 
+  "isMetaParameterDesignator": {
+    "returntype": "boolean", 
+    "kind": "syn", 
+    "args": "", 
+    "eqs": [
+      "Designator"
+    ]
+  }, 
+  "asSoftwareDesignator": {
+    "returntype": "SoftwareDesignator", 
+    "kind": "syn", 
+    "args": "", 
+    "eqs": [
+      "Designator"
+    ]
+  }, 
+  "isPropertyResourceDesignator": {
+    "returntype": "boolean", 
+    "kind": "syn", 
+    "args": "", 
+    "eqs": [
+      "Designator"
+    ]
+  }, 
+  "findImplementationByName": {
+    "returntype": "Implementation", 
+    "kind": "syn", 
+    "args": "String name", 
+    "eqs": [
+      "Root"
+    ]
+  }, 
+  "getRequiringClauseValue": {
+    "returntype": "double", 
+    "kind": "syn", 
+    "args": "ResourceType type, String propertyName, int index", 
+    "eqs": [
+      "Implementation"
+    ]
+  }, 
+  "findInstanceByName": {
+    "returntype": "Instance", 
+    "kind": "syn", 
+    "args": "String name", 
+    "eqs": [
+      "ResourceRequirement"
+    ]
+  }, 
+  "findResourceTypeByName": {
+    "returntype": "ResourceType", 
+    "kind": "syn", 
+    "args": "String name", 
+    "eqs": [
+      "HardwareModel"
+    ]
+  }, 
+  "findSubResourceByTypeName": {
+    "returntype": "Resource", 
+    "kind": "syn", 
+    "args": "String name", 
+    "eqs": [
+      "Resource"
+    ]
+  }, 
+  "resolveMetaParameter": {
+    "returntype": "MetaParameter", 
+    "kind": "syn", 
+    "args": "String name", 
+    "eqs": [
+      "SoftwareModel"
+    ]
+  }, 
+  "findResourceByName": {
+    "returntype": "Resource", 
+    "kind": "syn", 
+    "args": "String name", 
+    "eqs": [
+      "Resource"
+    ]
+  }, 
+  "getCurrentValueByProperty": {
+    "returntype": "double", 
+    "kind": "syn", 
+    "args": "Property property", 
+    "eqs": [
+      "Resource"
+    ]
+  }, 
+  "findSubResourceTypeByName": {
+    "returntype": "ResourceType", 
+    "kind": "syn", 
+    "args": "String name", 
+    "eqs": [
+      "ResourceType"
+    ]
+  }, 
+  "getRequiringClauseInstance": {
+    "returntype": "Instance", 
+    "kind": "syn", 
+    "args": "ResourceType type, String propertyName, int index", 
+    "eqs": [
+      "Implementation"
+    ]
+  }, 
+  "findFirstProvidingClause": {
+    "returntype": "Clause", 
+    "kind": "syn", 
+    "args": "Property property", 
+    "eqs": [
+      "Implementation"
+    ]
+  }, 
+  "findRequestByName": {
+    "returntype": "Request", 
+    "kind": "syn", 
+    "args": "String name", 
+    "eqs": [
+      "Root"
+    ]
+  }, 
+  "getCurrentValueByPropertyName": {
+    "returntype": "double", 
+    "kind": "syn", 
+    "args": "String name", 
+    "eqs": [
+      "Resource"
+    ]
+  }, 
+  "getConstraintValueByName": {
+    "returntype": "double", 
+    "kind": "syn", 
+    "args": "String name", 
+    "eqs": [
+      "Request"
+    ]
+  }, 
+  "resolveQualifiedName": {
+    "returntype": "Designator", 
+    "kind": "syn", 
+    "args": "QualifiedName qn", 
+    "eqs": [
+      "Implementation"
+    ]
+  }, 
+  "root": {
+    "returntype": "Root", 
+    "kind": "syn", 
+    "args": "", 
+    "eqs": [
+      "ASTNode"
+    ]
+  }, 
+  "asMetaParameterDesignator": {
+    "returntype": "MetaParameterDesignator", 
+    "kind": "syn", 
+    "args": "", 
+    "eqs": [
+      "Designator"
+    ]
+  }
+}

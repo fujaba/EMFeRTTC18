@@ -1,0 +1,8 @@
+aspect Printing {
+
+  eq ILP.print(MquatWriteSettings settings, int indentationLevel) {
+    // ILP should not be printed normally
+    return new MquatString(settings, indentationLevel);
+  }
+
+}

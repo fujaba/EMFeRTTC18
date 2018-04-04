@@ -1,0 +1,40 @@
+aspect Helpers {
+
+  public static void Clause.populateResourceMapping(ResourceMapping mapping, ResourceRequirement requirement, Resource resource) {
+
+    for (ResourceRequirement subRequirement : requirement.getResourceRequirementList()) {
+      int fittingResourceCount = 0;
+      for (int currentInstance = 0; currentInstance < subRequirement.getNumInstance(); currentInstance++) {
+        Instance instance = subRequirement.getInstance(currentInstance);
+        for (int currentResource = 0; currentResource < resource.getNumSubResource(); currentResource++) {
+          Resource subResource = resource.getSubResource(currentResource);
+          if (subResource.getType().getRef() == subRequirement.getResourceTypeRef().getRef()) {
+            if (currentInstance == fittingResourceCount) {
+              ResourceMapping newMapping = new ResourceMapping(instance, subResource, new de.tudresden.inf.st.mquat.jastadd.model.List<>());
+              mapping.addResourceMapping(newMapping);
+              populateResourceMapping(newMapping, subRequirement, subResource);
+              fittingResourceCount++;
+            }
+            currentInstance++;
+          }
+        }
+      }
+    }
+  }
+
+  uncache Clause.simpleAssignment(Request request, Resource resource);
+  syn Assignment Clause.simpleAssignment(Request request, Resource resource) {
+    Assignment assignment = new Assignment();
+    assignment.setRequest(request);
+    Implementation impl = containingImplementation();
+    if (impl != null) {
+      assignment.setImplementation(impl);
+
+      ResourceMapping mapping=new ResourceMapping(impl.getResourceRequirement().getInstance(0),resource,new de.tudresden.inf.st.mquat.jastadd.model.List<>());
+      populateResourceMapping(mapping,impl.getResourceRequirement(),resource);
+      assignment.setResourceMapping(mapping);
+    }
+    return assignment;
+  }
+
+}

@@ -1,0 +1,29 @@
+
+resource CPU1 : CPU {
+
+}
+
+restype
+
+component MYCOMPONENT {
+contract ImageViewer {
+    parameter cores
+	// requires 2 components Analyzer // version 1 for multiple components
+	requires resources CPU1, CPU2 of type CPU // version 2 for multiple components
+	requires CPU1.frequency >= 200
+	requires CPU1.parent = CPU2.parent
+	provides accuracy >= 0.5
+	provides refreshRate > 300
+	provides imageWidth > 800 // ignored for brevity
+	provides imageHeight > 600 // ignored for brevity
+	mode twoCores cores = 2, quality = * {
+		requires Analyzer1.accuracy > 0.5
+		requires Analyzer2.accuracy >= Analyzer1.accuracy + CPU1.frequency
+		requires Analyzer2.refreshRate > 400
+		// the following clause can not (and also should not be possible to) be modelled
+		// requires Analyzer1.accuracy + Analyzer2.accuracy < this.accuracy + CPU1.frequency --> this should not be possible, right?
+		requires CPU1.frequency > 450 // gets combined with outer constraint, i.e., overrides it
+		provides accuracy > 0.6 // gets combined with outer constraint, i.e., overrides it
+	}
+}
+}

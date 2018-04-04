@@ -1,0 +1,198 @@
+aspect ILP {
+
+  /**
+   * checks if an IlpVariable is a mapping variable
+   */
+  syn boolean IlpVariable.isMappingVariable() = false;
+  eq IlpMappingVariable.isMappingVariable() = true;
+
+  /**
+   * @return itself if it is a mapping variable, otherwise null
+   */
+  syn IlpMappingVariable IlpVariable.asMappingVariable() = null;
+  eq IlpMappingVariable.asMappingVariable() = this;
+
+  /**
+   * @return the name without the '_' characters
+   */
+  syn String ModelElement.getIlpName() = ilpSearchRegex.matcher(name()).replaceAll("_");
+  syn String Request.getIlpName()      = ilpSearchRegex.matcher(name()).replaceAll("_");
+
+  //--- ilpTimeout ---//
+
+  uncache Root.ilpTimeout(String reason);
+  syn TimedOutILP Root.ilpTimeout(String reason) {
+    TimedOutILP result = new TimedOutILP();
+    result.setReason(reason);
+    return result;
+  }
+
+  //--- hasTimeout ---//
+
+  syn boolean ILP.hasTimeout() = false;
+  eq TimedOutILP.hasTimeout() = true;
+
+  //--- timeoutReason ---//
+
+  syn String ILP.timeoutReason() = null;
+  eq TimedOutILP.timeoutReason() = getReason();
+
+
+  /**
+   * the non-terminal attribute to compute the ILP subtree
+   */
+  syn ILP Root.getILP() {
+    de.tudresden.inf.st.mquat.utils.StopWatch stopWatch = de.tudresden.inf.st.mquat.utils.StopWatch.start();
+//    StopWatch stopWatch = StopWatch.start();
+    long timeoutValue = (long) de.tudresden.inf.st.mquat.utils.StaticSettings.get(ILP_TIMEOUT_VALUE);
+    java.util.concurrent.TimeUnit timeoutUnit = (java.util.concurrent.TimeUnit) de.tudresden.inf.st.mquat.utils.StaticSettings.get(ILP_TIMEOUT_UNIT);
+    long timeoutNanos = timeoutUnit.toNanos(timeoutValue);
+
+    ILP result = new ILP();
+    IlpVarInfo info = new IlpVarInfo();
+
+    IlpObjective objective = new IlpObjective();
+    objective.setKind(IlpObjectiveKind.MINIMIZE);
+    IlpLeftHandSide olhs = new IlpLeftHandSide();
+    objective.setIlpLeftHandSide(olhs);
+    result.setIlpObjective(objective);
+    for (Request request : this.getRequestList()) {
+      for (Component comp : request.relevantComponents()) {
+        IlpLeftHandSide oneCompLhs = new IlpLeftHandSide();
+        for (Implementation impl : comp.getImplementationList()) {
+          if (stopWatch.time() > timeoutNanos) {
+            return ilpTimeout("Timeout in implementation " + impl.name());
+          }
+          oneCompLhs.addIlpTerm(new IlpTerm(1, info.getIlpVariable(request, impl)));
+          IlpLeftHandSide oneImplLhs = new IlpLeftHandSide();
+
+          // #1 Objective function
+          for (Resource resource : this.getHardwareModel().getResourceList()) {
+            // r1#c2#i3#hw4
+            IlpTerm term = new IlpTerm();
+            IlpVariable var = info.getIlpVariable(request, impl, resource);
+            term.setRef(var);
+            Clause providingObjectiveClause = impl.findFirstProvidingClause(getObjective().getPropertyRef().getRef());
+            if (providingObjectiveClause != null) {
+              term.setValue(providingObjectiveClause.evalUsing(request, resource));
+            } else {
+              term.setValue(0);
+            }
+            olhs.addIlpTerm(term);
+            oneImplLhs.addIlpTerm(new IlpTerm(1, var));
+          }
+          // 2.3 NFP-Negotiation: Requirements to other components
+          for (Clause reqClause : impl.requirementClauses()) {
+            if (stopWatch.time() > timeoutNanos) {
+              return ilpTimeout("Timeout in NFP-Negotiation");
+            }
+            Designator designator = reqClause.getDesignator();
+            IlpLeftHandSide reqLhs = new IlpLeftHandSide();
+            if (designator.isSoftwareDesignator()) {
+              for (Tuple<Implementation, Clause> tuple : reqClause.providingClausesOfRequiredComponent()) {
+                Implementation providingImpl = tuple.getKey();
+                Clause providingClause = tuple.getValue();
+                for (Resource resource : this.getHardwareModel().getResourceList()) {
+                  reqLhs.addIlpTerm(new IlpTerm(providingClause.evalUsing(request, resource),
+                      info.getIlpVariable(request, providingImpl, resource)));
+                }
+              }
+              for (Resource resource : this.getHardwareModel().getResourceList()) {
+                // we always use negative eval-value to get the required value on the right side (literally)
+                reqLhs.addIlpTerm(new IlpTerm(makeNegative(reqClause.evalUsing(request, resource)),
+                    info.getIlpVariable(request, impl, resource)));
+              }
+              result.addIlpConstraint(new IlpConstraint(
+                  request.getIlpName() + "_" + impl.getIlpName() + "_reqs_" +
+                      designator.asSoftwareDesignator().getPropertyRef().getRef().getIlpName() + "_from_" +
+                      designator.asSoftwareDesignator().getInstanceRef().getRef().referringComponent().getIlpName(),
+                  reqLhs, reqClause.getClauseComparator(), 0));
+            } else {
+              for (Resource resource : this.getHardwareModel().getResourceList()) {
+                // check if constraint is fulfilled, otherwise remember this illegal combination
+                if (!reqClause.checkUsing(request, resource)) {
+                  info.setIllegal(request, impl, resource);
+                }
+              }
+            }
+          }
+
+          // 2.2 Architecture constraints: One impl/resource and request
+          oneImplLhs.addIlpTerm(new IlpTerm(-1, info.getIlpVariable(request, impl)));
+          result.addIlpConstraint(new IlpConstraint(request.getIlpName() + "_single_" + impl.getIlpName(),
+              oneImplLhs, ClauseComparator.EQ, 0));
+          // 2.3 NFP-Negotiation: Use implementations of required components
+          for (ComponentRequirement req : impl.getComponentRequirementList()) {
+            IlpLeftHandSide reqImplLhs = new IlpLeftHandSide();
+            for (Implementation reqImpl : req.getComponentRef().getRef().getImplementationList()) {
+              reqImplLhs.addIlpTerm(new IlpTerm(1, info.getIlpVariable(request, reqImpl)));
+            }
+            reqImplLhs.addIlpTerm(new IlpTerm(-1, info.getIlpVariable(request, impl)));
+            result.addIlpConstraint(new IlpConstraint(request.getIlpName() + "_" + impl.getIlpName() +
+                "_req_" + req.getComponentRef().getRef().getIlpName(),
+                reqImplLhs, ClauseComparator.GE, 0));
+          }
+        }
+        // 2.2 Architecture constraints: One impl per component and request
+        result.addIlpConstraint(new IlpConstraint(request.getIlpName() + "_opc_" + comp.getIlpName(),
+            oneCompLhs, ClauseComparator.LE, 1));
+      }
+      // 2.1.a Request constraints: Target component (i.e., use one of its implementations)
+      IlpLeftHandSide targetLhs = new IlpLeftHandSide();
+      for (Implementation impl : request.getTarget().getRef().getImplementationList()) {
+        IlpVariable var = info.getIlpVariable(request, impl);
+        targetLhs.addIlpTerm(new IlpTerm(1, var));
+      }
+      result.addIlpConstraint(new IlpConstraint(request.getIlpName() + "_target", targetLhs, ClauseComparator.EQ, 1));
+      // 2.1.b Request constraints: Required NFPs of target component
+      for (Clause requiredClause : request.getConstraintList()) {
+        IlpLeftHandSide reqLhs = new IlpLeftHandSide();
+        Property requiredProperty = requiredClause.getDesignator().asSoftwareDesignator().getPropertyRef().getRef();
+        for(Implementation impl : request.getTarget().getRef().getImplementationList()) {
+          for (Resource resource : this.getHardwareModel().getResources()) {
+            Clause providingClause = impl.findFirstProvidingClause(requiredProperty);
+            if (providingClause != null) {
+              IlpVariable var = info.getIlpVariable(request, impl, resource);
+              reqLhs.addIlpTerm(new IlpTerm(providingClause.evalUsing(request, resource), var));
+            }
+          }
+        }
+        result.addIlpConstraint(new IlpConstraint(request.getIlpName() + "_req_" + requiredProperty.getIlpName(),
+            reqLhs, requiredClause.getClauseComparator(),
+            requiredClause.evalUsing(request, null)));
+      }
+    }
+    if (stopWatch.time() > timeoutNanos) {
+      return ilpTimeout("Timeout after constraint creation");
+    }
+    /*
+    #2 Constraints
+    #2.1 Request constraints (requiredNFPs)
+    #2.2 Architecture constraints (One SW on one HW, Only one mode/configuration per impl and per SW)
+    #2.3 NFP-negotiation (Satisfy requirements from SW to both SW and HW)
+    */
+
+    // 2.2 Architecture constraints: Only one config per hardware resource
+    for (IlpConstraint constraint : info.resourceConstraints.values()) {
+      result.addIlpConstraint(constraint);
+    }
+
+    // Generals
+    for (IlpVariable var : info.vars.values()) {
+      result.addIlpVariable(var);
+    }
+
+    // Bounds (all binary except illegal which are zero)
+    info.vars.values().removeAll(info.illegal);
+    for (IlpVariable var : info.vars.values()) {
+      // TODO uncomment addIlpBound line. Comment out to not clutter output for the moment.
+      result.addIlpBound(new IlpBound(var, IlpBoundType.BINARY));
+    }
+    for (IlpVariable var : info.illegal) {
+      result.addIlpBound(new IlpBound(var, IlpBoundType.ZERO));
+    }
+    result.setInfo(info);
+    return result;
+  }
+
+}

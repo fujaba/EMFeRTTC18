@@ -1,0 +1,23 @@
+module("expressions") {
+
+	java {
+		basedir "src/main/java/"
+		include "**/*.java"
+	}
+
+	jastadd {
+		basedir "src/main/jastadd/"
+		include "**/*.ast"
+		include "**/*.jadd"
+		include "**/*.jrag"
+	}
+
+	scanner {
+	    include "src/main/jastadd/mquat.flex"
+	}
+
+	parser {
+	    include "src/main/jastadd/mquat.parser"
+	}
+
+}

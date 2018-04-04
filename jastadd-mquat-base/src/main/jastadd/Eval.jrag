@@ -1,0 +1,111 @@
+aspect eval {
+
+
+  uncache Clause.checkUsing(Request request, Resource resource);
+  syn boolean Clause.checkUsing(Request request, Resource resource) = checkUsing(simpleAssignment(request, resource));
+
+  syn double Expression.evalAsDouble();
+
+  eq LiteralExpression.evalAsDouble() = getValue();
+  eq ParenthesizedExpression.evalAsDouble() = getExpression().evalAsDouble();
+
+  eq AddExpression.evalAsDouble() = getLeft().evalAsDouble() + getRight().evalAsDouble();
+  eq SubExpression.evalAsDouble() = getLeft().evalAsDouble() - getRight().evalAsDouble();
+  eq MultExpression.evalAsDouble() = getLeft().evalAsDouble() * getRight().evalAsDouble();
+  eq DivExpression.evalAsDouble() = getLeft().evalAsDouble() / getRight().evalAsDouble();
+  eq PowerExpression.evalAsDouble() = Math.pow(getLeft().evalAsDouble(), getRight().evalAsDouble());
+
+  syn double Designator.evalAsDouble();
+  eq QualifiedNameDesignator.evalAsDouble() {
+    throw new RuntimeException("This attribute should not be called because a QualifiedNameDesignator is a temporary node!");
+    }
+  eq SoftwareDesignator.evalAsDouble() {
+    throw new RuntimeException("TODO implement ParentResourceDesignator.evalAsDouble()");
+  }
+  eq PropertyResourceDesignator.evalAsDouble() {
+    if (inRequiringClause()) {
+      // TODO
+    }
+    throw new RuntimeException("TODO implement PropertyResourceDesignator.evalAsDouble()");
+  }
+  eq MetaParameterDesignator.evalAsDouble() {
+    throw new RuntimeException("TODO implement MetaParameterDesignator.evalAsDouble()");
+  }
+
+  uncache Clause.evalUsing(Request request, Resource target);
+  syn double Clause.evalUsing(Request request, Resource target) = evalUsing(simpleAssignment(request, target));
+
+  // eval using for assignments
+  uncache Clause.evalUsing(Assignment assignment);
+  syn double Clause.evalUsing(Assignment assignment) = getExpression().evalUsing(assignment);
+
+  uncache Expression.evalUsing(Assignment assignment);
+  syn double Expression.evalUsing(Assignment assignment);
+
+  eq LiteralExpression.evalUsing(Assignment assignment) = getValue();
+  eq ParenthesizedExpression.evalUsing(Assignment assignment) = getExpression().evalUsing(assignment);
+
+  eq AddExpression.evalUsing(Assignment assignment) = getLeft().evalUsing(assignment) + getRight().evalUsing(assignment);
+  eq SubExpression.evalUsing(Assignment assignment) = getLeft().evalUsing(assignment) - getRight().evalUsing(assignment);
+  eq MultExpression.evalUsing(Assignment assignment) = getLeft().evalUsing(assignment) * getRight().evalUsing(assignment);
+  eq DivExpression.evalUsing(Assignment assignment) = getLeft().evalUsing(assignment) / getRight().evalUsing(assignment);
+  eq PowerExpression.evalUsing(Assignment assignment) = Math.pow(getLeft().evalUsing(assignment), getRight().evalUsing(assignment));
+
+  uncache Designator.evalUsing(Assignment assignment);
+  syn double Designator.evalUsing(Assignment assignment);
+  eq QualifiedNameDesignator.evalUsing(Assignment assignment) {
+    throw new RuntimeException("This attribute should not be called because a QualifiedNameDesignator is a temporary node!");
+  }
+  eq SoftwareDesignator.evalUsing(Assignment assignment) {
+    Assignment providingAssignment;
+    if (this.hasInstanceRef()) {
+      // referencing a required component
+      providingAssignment = assignment.mappedAssignment(this.getInstanceRef().getRef());
+    } else {
+      // use given implementation for resolving
+      providingAssignment = assignment;
+    }
+    if (providingAssignment == null) {
+      MquatWriteSettings settings = new MquatWriteSettings("");
+      logger.error("Could not evaluate {} in {} of {}",
+        this.print(settings), containingClause().print(settings),
+    ((ModelElement)containingClause().getParent()).name());
+      return 0;
+    }
+    for (Clause clause : providingAssignment.getImplementation().getClauseList()) {
+      if (clause.isProvidingClause()) {
+        if (clause.getDesignator().isSoftwareDesignator()) {
+          SoftwareDesignator sd = clause.getDesignator().asSoftwareDesignator();
+          if (!sd.hasInstanceRef()) {
+            if (sd.getPropertyRef().getRef().equals(this.getPropertyRef().getRef())) {
+              return clause.getExpression().evalUsing(providingAssignment);
+            }
+            // found another provision clause with a different property
+          }
+        }
+      }
+    }
+    throw new RuntimeException("this should not be happening!");
+  }
+  eq PropertyResourceDesignator.evalUsing(Assignment assignment) {
+    Resource resource = assignment.mappedResource(this.getInstanceRef().getRef());
+    return resource.getCurrentValueByProperty(this.getPropertyRef().getRef());
+  }
+  eq MetaParameterDesignator.evalUsing(Assignment assignment) {
+    LiteralExpression litExp = assignment.getRequest().getMetaParameterExpression(getMetaParameterRef().getRef());
+    if (litExp != null) {
+      // TODO could also using evalAsDouble here
+      return litExp.evalUsing(assignment);
+    }
+    logger.error("evalUsing: Request did not have assignment for meta {}, returning 0", getMetaParameterRef().name());
+    return 0;
+  }
+
+  rewrite QualifiedNameDesignator {
+    to Designator {
+      MquatWriteSettings settings = new MquatWriteSettings(" ");
+      return containingClause().resolveQualifiedName(this.getQualifiedName());
+    }
+  }
+
+}

@@ -1,0 +1,460 @@
+aspect Printing {
+
+  syn MquatString ASTNode.print(MquatWriteSettings settings) = print(settings, 0);
+
+  syn MquatString ASTNode.print(MquatWriteSettings settings, int indentationLevel);
+
+  eq ASTNode.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    logger.error("Missing print() implementation for class {}", this.getClass().getSimpleName());
+
+    java.util.Iterator iterator = this.astChildIterator();
+    while (iterator.hasNext()) {
+      ASTNode child = (ASTNode)iterator.next();
+      if (child != null) result.append(child.print(settings, indentationLevel));
+    }
+
+    return result;
+  }
+
+  eq List.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    for (ASTNode child : this) {
+      if (child != null) result.append(child.print(settings, indentationLevel));
+    }
+
+    return result;
+  }
+
+  eq Root.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+    result.append(getHardwareModel().print(settings, indentationLevel))
+          .lb().lb()
+          .append(getSoftwareModel().print(settings, indentationLevel))
+          .lb().lb();
+    for (Request r : getRequestList()) {
+      result.append(r.print(settings, indentationLevel));
+    }
+    result.append(getObjective().print(settings, indentationLevel));
+    return result;
+  }
+
+// =====================================================================================================================
+// Low-Level Grammar Rules
+// =====================================================================================================================
+
+  eq Name.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+    result.append(getName());
+    return result;
+  }
+
+  eq QualifiedName.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    boolean first = true;
+    for (Name name : getNameList()) {
+      if (first) {
+        first = false;
+      } else {
+        result.append(".");
+      }
+      result.append(name.print(settings, indentationLevel)).append(".");
+    }
+    return result;
+  }
+
+// =====================================================================================================================
+// Top-Level Grammar Rules
+// =====================================================================================================================
+
+  eq Instance.print(MquatWriteSettings settings, int indentationLevel) {
+    return getName().print(settings, indentationLevel);
+  }
+
+  eq InstanceRef.print(MquatWriteSettings settings, int indentationLevel) {
+    return getName().print(settings, indentationLevel);
+  }
+
+// =====================================================================================================================
+// Hardware
+// =====================================================================================================================
+
+  eq HardwareModel.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    for (ResourceType resourceType : getResourceTypeList()) {
+      result.append(resourceType.print(settings, indentationLevel));
+    }
+
+    for (Resource resource : getResourceList()) {
+      result.append(resource.print(settings, indentationLevel));
+    }
+
+    for (Property property : getPropertyList()) {
+      result.append(property.print(settings, indentationLevel));
+    }
+
+    return result;
+  }
+
+  eq ResourceType.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+    if (getContainer()) {
+      result.append("container ");
+    }
+    result.append("resource type ").append(getName().print(settings, indentationLevel)).append(" {").lb().ind();
+    indentationLevel++;
+    for (ResourceType subType: getSubTypeList()) {
+      result.append(subType.print(settings, indentationLevel));
+    }
+    for (Property property: getPropertyList()) {
+      result.append(property.print(settings, indentationLevel));
+    }
+    for (PropertyRef ref: getPropertyRefList()) {
+      result.append("using property ").append(ref.print(settings, indentationLevel)).lb();
+    }
+    indentationLevel--;
+    result.und().append("}").lb();
+    return result;
+  }
+
+  eq ResourceTypeRef.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+    result.append(getName().print(settings, indentationLevel));
+    return result;
+  }
+
+  eq ResourceRequirement.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    boolean first = true;
+    for (Instance instance: getInstanceList()) {
+      if (!first) {
+        result.append(", ");
+      }
+      result.append(instance.print(settings, indentationLevel));
+      first = false;
+    }
+    if (getInstanceList().numChildren() > 0) {
+      result.append(" ");
+    }
+    result.append("of type ").append(getResourceTypeRef().print(settings, indentationLevel));
+    if (getNumResourceRequirement() > 0) {
+      // iterate over nested requirements
+      result.append(" with {").ind().lb();
+      for (ResourceRequirement subReq : getResourceRequirementList()) {
+        result.append(subReq.print(settings, indentationLevel + 1));
+      }
+      result.und().lb().append("}");
+    }
+    result.lb();
+    return result;
+  }
+
+  eq Resource.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+    result.append("resource ").append(getName().print(settings, indentationLevel)).append(":").
+        append(getType().print(settings, indentationLevel)).append(" {").lb().ind();
+    indentationLevel++;
+    for (Resource subResource: getSubResourceList()) {
+      result.append(subResource.print(settings, indentationLevel));
+    }
+    for (CurrentResourceValue value: getCurrentResourceValueList()) {
+      result.append(value.print(settings, indentationLevel));
+    }
+    indentationLevel--;
+    result.und().append("}").lb();
+    return result;
+  }
+
+  eq CurrentResourceValue.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+    result.append(getPropertyRef().print(settings, indentationLevel)).append(" = ")
+        .append(getValue().print(settings, indentationLevel)).lb();
+    return result;
+  }
+
+// =====================================================================================================================
+// Software
+// =====================================================================================================================
+
+  eq SoftwareModel.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    for (MetaParameter m: getMetaParameterList()) {
+      result.append(m.print(settings, indentationLevel)).lb();
+    }
+    result.lb();
+
+    for (Property property : getPropertyList()) {
+      result.append(property.print(settings, indentationLevel));
+    }
+    result.lb();
+
+    for (Component component : getComponentList()) {
+      result.append(component.print(settings, indentationLevel));
+    }
+    return result;
+  }
+
+  eq Component.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    result.append("component ").append(getName().print(settings, indentationLevel)).append(" {").ind().lb();
+
+    indentationLevel += 1;
+    for (Implementation implementation : getImplementationList()) {
+      result.append(implementation.print(settings, indentationLevel));
+    }
+
+    for (Property property : getPropertyList()) {
+      result.append(property.print(settings, indentationLevel));
+    }
+
+    for (PropertyRef propertyRef : getPropertyRefList()) {
+      result.append("using property ").append(propertyRef.print(settings, indentationLevel)).lb();
+    }
+
+    indentationLevel -= 1;
+    result.und().lb().append("}").lb().append("").lb();
+
+    return result;
+  }
+
+  eq ComponentRef.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+    result.append(getName().print(settings, indentationLevel));
+    return result;
+  }
+
+  eq ComponentRequirement.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    result.append("requires component ");
+    boolean first = true;
+    for (Instance instance: getInstanceList()) {
+      if (!first) {
+        result.append(", ");
+      }
+      result.append(instance.print(settings, indentationLevel));
+      first = false;
+    }
+    if (getInstanceList().numChildren() > 0) {
+      result.append(" ");
+    }
+    result.append("of type ").append(getComponentRef().print(settings, indentationLevel)).lb();
+    return result;
+  }
+
+  eq Implementation.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    result.append("contract ").append(getName().print(settings, indentationLevel)).append(" {").ind().lb();
+
+    indentationLevel += 1;
+
+    for (ComponentRequirement componentRequirement : getComponentRequirementList()) {
+      result.append(componentRequirement.print(settings, indentationLevel));
+    }
+
+    result.append("requires resource ");
+    result.append(getResourceRequirement().print(settings, indentationLevel));
+
+    for (Clause clause : getClauseList()) {
+      result.append(clause.print(settings, indentationLevel)).lb();
+    }
+
+    result.append("").lb();
+
+    indentationLevel -= 1;
+    result.und().append("}").lb();
+
+    return result;
+  }
+
+// =====================================================================================================================
+// Clauses and Designators
+// =====================================================================================================================
+
+  eq Clause.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    if (getClauseType() == ClauseType.REQUIRING) {
+      result.append("requiring ");
+    } else if(getClauseType() == ClauseType.PROVIDING) {
+      result.append("providing ");
+    }
+
+    result.append(getDesignator().print(settings, indentationLevel)).append(' ').append(getClauseComparator().symbol());
+    result.append(' ').append(getExpression().print(settings, indentationLevel));
+
+    return result;
+  }
+
+  eq QualifiedNameDesignator.print(MquatWriteSettings settings, int indentationLevel) {
+    return getQualifiedName().print(settings, indentationLevel);
+  }
+
+  eq SoftwareDesignator.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    if (hasInstanceRef()) {
+      result.append(getInstanceRef().print(settings, indentationLevel)).append(".");
+    }
+
+    result.append(getPropertyRef().print(settings, indentationLevel));
+
+    return result;
+  }
+
+  eq PropertyResourceDesignator.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    result.append(getInstanceRef().print(settings, indentationLevel)).append(".");
+
+    result.append(getPropertyRef().print(settings, indentationLevel));
+
+    return result;
+  }
+
+  eq MetaParameterDesignator.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    result.append(getMetaParameterRef().print(settings, indentationLevel));
+
+    return result;
+  }
+
+// =====================================================================================================================
+// Properties and Meta-Parameters
+// =====================================================================================================================
+
+  eq Property.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    result.append(" property ").append(getName().print(settings, indentationLevel)).append(" [");
+    result.append(getUnit()).append("]").lb();
+
+    return result;
+  }
+
+  eq PropertyRef.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+    result.append(getName().print(settings, indentationLevel));
+    return result;
+  }
+
+  eq MetaParameter.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    result.append("meta ").append(getName().print(settings, indentationLevel));
+
+    return result;
+  }
+
+  eq MetaParameterRef.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+    result.append(getName().print(settings, indentationLevel));
+    return result;
+  }
+
+  eq MetaParameterAssignment.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    result.append("meta ").append(getMetaParameterRef().print(settings, indentationLevel)).append(" = ")
+        .append(getLiteralExpression().print(settings, indentationLevel));
+
+    return result;
+  }
+
+// =====================================================================================================================
+// Requests
+// =====================================================================================================================
+
+  eq Request.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    result.append("request ").append(getName().print(settings, indentationLevel)).append(" for ")
+        .append(getTarget().print(settings, indentationLevel)).append(" {").lb().ind();
+    for (MetaParameterAssignment p: getMetaParameterAssignmentList()) {
+      result.append(p.print(settings, indentationLevel)).lb();
+    }
+    for (Clause c: getConstraintList()) {
+      result.append(c.print(settings, indentationLevel));
+    }
+    result.und().lb().append("}").lb();
+    return result;
+  }
+
+  eq Objective.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+    if (getAgg() == PropertyAggregation.SUM) {
+      return result.append("minimize sum(").append(getPropertyRef().print(settings, indentationLevel)).append(")").lb();
+    } else if (getAgg() == PropertyAggregation.MAX) {
+      return result.append("minimize maximum(").append(getPropertyRef().print(settings, indentationLevel)).append(")").lb();
+    }
+    return result;
+  }
+
+
+// =====================================================================================================================
+// Expressions
+// =====================================================================================================================
+
+  eq LiteralExpression.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+    result.append(getValue());
+    return result;
+  }
+
+  eq AddExpression.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    result.append("(").append(getLeft().print(settings, indentationLevel)).append("+").append(getRight().print(settings, indentationLevel)).append(")");
+
+    return result;
+  }
+
+  eq SubExpression.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    result.append("(").append(getLeft().print(settings, indentationLevel)).append("-").append(getRight().print(settings, indentationLevel)).append(")");
+
+    return result;
+  }
+
+  eq MultExpression.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    result.append("(").append(getLeft().print(settings, indentationLevel)).append("*").append(getRight().print(settings, indentationLevel)).append(")");
+
+    return result;
+  }
+
+  eq DivExpression.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    result.append("(").append(getLeft().print(settings, indentationLevel)).append("/").append(getRight().print(settings, indentationLevel)).append(")");
+
+    return result;
+  }
+
+  eq PowerExpression.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+
+    result.append("(").append(getLeft().print(settings, indentationLevel)).append("^").append(getRight().print(settings, indentationLevel)).append(")");
+
+    return result;
+  }
+
+  syn String Root.info() {
+    SoftwareModel sw = getSoftwareModel();
+    return  "Top-Level Components: " + sw.getNumComponent() + "\n" +
+            "Impls of first comp: " + sw.getComponent(0).getNumImplementation() + "\n" +
+            "Resources: " + getHardwareModel().getNumResource() + "\n" +
+            "Requests: " + getNumRequest();
+  }
+}

@@ -1,0 +1,111 @@
+/**
+ * This aspect should contain attributes that are specific to the specific hardware component model also defined here
+ */
+aspect SimpleHardwareModel {
+
+  /**
+   * create a simple haredware model
+   */
+  public static HardwareModel Root.createSimpleHardwareModel() {
+    HardwareModel hardwareModel = new HardwareModel();
+
+    // common properties of several hardware resources
+    Property total = new Property(new Name("total"), "MB");
+    hardwareModel.addProperty(total);
+
+    Property free = new Property(new Name("free"), "MB");
+    hardwareModel.addProperty(free);
+
+    // the top-level resource type
+    ResourceType type = new ResourceType();
+    type.setName(new Name("ComputeNode"));
+    type.setContainer(true);
+
+    // subtype CPU
+    ResourceType cpu = new ResourceType();
+    cpu.setContainer(false);
+    cpu.setName(new Name("CPU"));
+    Property frequency = new Property(new Name("frequency"), "Hz");
+    Property load = new Property(new Name("load"), "%");
+    cpu.addProperty(frequency);
+    cpu.addProperty(load);
+    type.addSubType(cpu);
+
+
+    // subtype memory
+    ResourceType ram = new ResourceType();
+    ram.setName(new Name("RAM"));
+    ram.setContainer(false);
+    ram.addPropertyRef(total.createRef());
+    ram.addPropertyRef(free.createRef());
+    type.addSubType(ram);
+
+    // subtype disk
+    ResourceType disk = new ResourceType();
+    disk.setName(new Name("DISK"));
+    disk.setContainer(false);
+    disk.addPropertyRef(total.createRef());
+    disk.addPropertyRef(free.createRef());
+    type.addSubType(disk);
+
+    // subtype network
+    ResourceType network = new ResourceType();
+    network.setName(new Name("NETWORK"));
+    network.setContainer(false);
+    Property latency = new Property(new Name("latency"), "ms");
+    Property throughput = new Property(new Name("throughput"), "kB/s");
+    network.addProperty(latency);
+    network.addProperty(throughput);
+    type.addSubType(network);
+
+    hardwareModel.addResourceType(type);
+
+    return hardwareModel;
+  }
+
+  syn ResourceType HardwareModel.computeResourceType() {
+    for (ResourceType resourceType : getResourceTypeList()) {
+      if ("ComputeNode".equals(resourceType.name())) {
+        return resourceType;
+      }
+    }
+    return null;
+  }
+
+  syn ResourceType HardwareModel.cpuType() {
+    for (ResourceType resourceType : computeResourceType().getSubTypeList()) {
+      if ("CPU".equals(resourceType.name())) {
+        return resourceType;
+      }
+    }
+    return null;
+  }
+
+  syn ResourceType HardwareModel.ramType() {
+    for (ResourceType resourceType : computeResourceType().getSubTypeList()) {
+      if ("RAM".equals(resourceType.name())) {
+        return resourceType;
+      }
+    }
+    return null;
+  }
+
+  syn ResourceType HardwareModel.diskType() {
+    for (ResourceType resourceType : computeResourceType().getSubTypeList()) {
+      if ("DISK".equals(resourceType.name())) {
+        return resourceType;
+      }
+    }
+    return null;
+  }
+
+  syn ResourceType HardwareModel.networkType() {
+    for (ResourceType resourceType : computeResourceType().getSubTypeList()) {
+      if ("NETWORK".equals(resourceType.name())) {
+        return resourceType;
+      }
+    }
+    return null;
+  }
+
+}

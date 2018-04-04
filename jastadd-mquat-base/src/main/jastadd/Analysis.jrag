@@ -1,0 +1,18 @@
+/**
+ * This aspect contains commonly used attributes to easier navigate the model
+ */
+aspect Analysis {
+
+  syn boolean Clause.isRequiringClause() = getClauseType() == ClauseType.REQUIRING;
+  syn boolean Clause.isProvidingClause() = getClauseType() == ClauseType.PROVIDING;
+
+  inh boolean Designator.inProvidingClause();
+  eq Root.getSoftwareModel().inProvidingClause() = false;
+  eq Clause.getExpression().inProvidingClause() = isProvidingClause();
+  eq Clause.getDesignator().inProvidingClause() = isProvidingClause();
+
+  inh boolean Designator.inRequiringClause();
+  eq Root.getSoftwareModel().inRequiringClause() = false;
+  eq Clause.getExpression().inRequiringClause() = isRequiringClause();
+  eq Clause.getDesignator().inRequiringClause() = isRequiringClause();
+}

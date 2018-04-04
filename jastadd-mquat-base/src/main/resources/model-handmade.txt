@@ -1,0 +1,297 @@
+
+container resource type ComputeNode {
+    resource type CPU {
+        static property frequency [Hz]
+        runtime property load [%]
+    }
+    resource type RAM {
+        using property total
+        using property free
+    }
+    resource type DISK {
+        using property total
+        using property free
+    }
+    resource type NETWORK {
+        static property latency [ms]
+        static property throughput [kB/s]
+    }
+    derived property flops [ops/s]
+    runtime property STATE []
+}
+resource resource0:ComputeNode {
+    resource cpu0_0:CPU {
+        frequency = 2930
+        load = 0
+    }
+    resource cpu0_1:CPU {
+        frequency = 2930
+        load = 0
+    }
+    resource cpu0_2:CPU {
+        frequency = 2930
+        load = 0
+    }
+    resource cpu0_3:CPU {
+        frequency = 2930
+        load = 0
+    }
+    resource ram0:RAM {
+        total = 10596
+        free = 12709
+    }
+    resource disk0:DISK {
+        total = 3421
+        free = 6238
+    }
+    resource network0:NETWORK {
+        latency = 762
+        throughput = 22003
+    }
+}
+
+meta size
+
+static property total [MB]
+runtime property free [MB]
+runtime property energy [J]
+runtime property quality [%]
+
+component component_0 {
+    contract implementation_0i0 {
+        requires component the_component_0i0_0 of type component_0i0_0
+        requires component the_component_0i0_1 of type component_0i0_1
+        requires resource compute_resource_0 of type ComputeNode
+        requires resource cpu_0 of type CPU
+        requires resource cpu_1 of type CPU
+        requires resource cpu_2 of type CPU
+        requires resource cpu_3 of type CPU
+        requires resource ram_1 of type RAM
+        requires resource disk_1 of type DISK
+        requires resource network_1 of type NETWORK
+        requiring the_component_0i0_0.quality >= 95
+        requiring the_component_0i0_1.quality >= 86
+
+        mode configuration_0i0m0 {
+            requiring cpu_0.frequency >= 2159
+            requiring cpu_1.frequency >= 2159
+            requiring cpu_2.frequency >= 2159
+            requiring cpu_3.frequency >= 2159
+            requiring ram_1.total >= 11005
+            requiring disk_1.total >= 13482
+            requiring network_1.throughput >= 76460
+            providing compute_resource_0.flops = (((cpu_0.frequency+cpu_1.frequency)+cpu_2.frequency)+cpu_3.frequency)
+            providing quality = 90
+            providing energy = ((0.59*(size^2))+(0.89*compute_resource_0.flops))
+        }
+        mode configuration_0i0m1 {
+            requiring cpu_0.frequency >= 2929
+            requiring cpu_1.frequency >= 2929
+            requiring cpu_2.frequency >= 2929
+            requiring cpu_3.frequency >= 2929
+            requiring ram_1.total >= 10595
+            requiring disk_1.total >= 3420
+            requiring network_1.throughput >= 22002
+            providing compute_resource_0.flops = (((cpu_0.frequency+cpu_1.frequency)+cpu_2.frequency)+cpu_3.frequency)
+            providing quality = 35
+            providing energy = ((0.11*(size^2))+(0.94*compute_resource_0.flops))
+        }
+    }
+    contract implementation_0i1 {
+        requires component the_component_0i1_0 of type component_0i1_0
+        requires component the_component_0i1_1 of type component_0i1_1
+        requires resource compute_resource_0 of type ComputeNode
+        requires resource cpu_0 of type CPU
+        requires resource cpu_1 of type CPU
+        requires resource cpu_2 of type CPU
+        requires resource cpu_3 of type CPU
+        requires resource ram_1 of type RAM
+        requires resource disk_1 of type DISK
+        requires resource network_1 of type NETWORK
+        requiring the_component_0i1_0.quality >= 72
+        requiring the_component_0i1_1.quality >= 30
+
+        mode configuration_0i1m0 {
+            requiring cpu_0.frequency >= 2289
+            requiring cpu_1.frequency >= 2289
+            requiring cpu_2.frequency >= 2289
+            requiring cpu_3.frequency >= 2289
+            requiring ram_1.total >= 14825
+            requiring disk_1.total >= 6315
+            requiring network_1.throughput >= 52125
+            providing compute_resource_0.flops = (((cpu_0.frequency+cpu_1.frequency)+cpu_2.frequency)+cpu_3.frequency)
+            providing quality = 10
+            providing energy = ((0.17*(size^2))+(0.78*compute_resource_0.flops))
+        }
+        mode configuration_0i1m1 {
+            requiring cpu_0.frequency >= 1888
+            requiring cpu_1.frequency >= 1888
+            requiring cpu_2.frequency >= 1888
+            requiring cpu_3.frequency >= 1888
+            requiring ram_1.total >= 4782
+            requiring disk_1.total >= 5972
+            requiring network_1.throughput >= 45852
+            providing compute_resource_0.flops = (((cpu_0.frequency+cpu_1.frequency)+cpu_2.frequency)+cpu_3.frequency)
+            providing quality = 1
+            providing energy = ((0.25*(size^2))+(0.44*compute_resource_0.flops))
+        }
+    }
+}
+
+component component_0i0_0 {
+    contract implementation_0i0_0i0 {
+        requires resource compute_resource_0 of type ComputeNode
+        requires resource cpu_0 of type CPU
+        requires resource cpu_1 of type CPU
+        requires resource cpu_2 of type CPU
+        requires resource cpu_3 of type CPU
+        requires resource ram_1 of type RAM
+        requires resource disk_1 of type DISK
+        requires resource network_1 of type NETWORK
+
+        mode configuration_0i0_0i0m0 {
+            requiring cpu_0.frequency >= 2847
+            requiring cpu_1.frequency >= 2847
+            requiring cpu_2.frequency >= 2847
+            requiring cpu_3.frequency >= 2847
+            requiring ram_1.total >= 1009
+            requiring disk_1.total >= 13412
+            requiring network_1.throughput >= 10042
+            providing compute_resource_0.flops = (((cpu_0.frequency+cpu_1.frequency)+cpu_2.frequency)+cpu_3.frequency)
+            providing quality = 2
+            providing energy = ((0.28*(size^2))+(0.96*compute_resource_0.flops))
+        }
+        mode configuration_0i0_0i0m1 {
+            requiring cpu_0.frequency >= 1901
+            requiring cpu_1.frequency >= 1901
+            requiring cpu_2.frequency >= 1901
+            requiring cpu_3.frequency >= 1901
+            requiring ram_1.total >= 15803
+            requiring disk_1.total >= 4106
+            requiring network_1.throughput >= 58977
+            providing compute_resource_0.flops = (((cpu_0.frequency+cpu_1.frequency)+cpu_2.frequency)+cpu_3.frequency)
+            providing quality = 95
+            providing energy = ((0.24*(size^2))+(0.39*compute_resource_0.flops))
+        }
+    }
+}
+
+component component_0i0_1 {
+    contract implementation_0i0_1i0 {
+        requires resource compute_resource_0 of type ComputeNode
+        requires resource cpu_0 of type CPU
+        requires resource cpu_1 of type CPU
+        requires resource cpu_2 of type CPU
+        requires resource cpu_3 of type CPU
+        requires resource ram_1 of type RAM
+        requires resource disk_1 of type DISK
+        requires resource network_1 of type NETWORK
+
+        mode configuration_0i0_1i0m0 {
+            requiring cpu_0.frequency >= 1968
+            requiring cpu_1.frequency >= 1968
+            requiring cpu_2.frequency >= 1968
+            requiring cpu_3.frequency >= 1968
+            requiring ram_1.total >= 2057
+            requiring disk_1.total >= 9579
+            requiring network_1.throughput >= 64854
+            providing compute_resource_0.flops = (((cpu_0.frequency+cpu_1.frequency)+cpu_2.frequency)+cpu_3.frequency)
+            providing quality = 60
+            providing energy = ((0.45*(size^2))+(0.34*compute_resource_0.flops))
+        }
+        mode configuration_0i0_1i0m1 {
+            requiring cpu_0.frequency >= 2573
+            requiring cpu_1.frequency >= 2573
+            requiring cpu_2.frequency >= 2573
+            requiring cpu_3.frequency >= 2573
+            requiring ram_1.total >= 7208
+            requiring disk_1.total >= 8109
+            requiring network_1.throughput >= 10366
+            providing compute_resource_0.flops = (((cpu_0.frequency+cpu_1.frequency)+cpu_2.frequency)+cpu_3.frequency)
+            providing quality = 52
+            providing energy = ((0.02*(size^2))+(0.71*compute_resource_0.flops))
+        }
+    }
+}
+
+component component_0i1_0 {
+    contract implementation_0i1_0i0 {
+        requires resource compute_resource_0 of type ComputeNode
+        requires resource cpu_0 of type CPU
+        requires resource cpu_1 of type CPU
+        requires resource cpu_2 of type CPU
+        requires resource cpu_3 of type CPU
+        requires resource ram_1 of type RAM
+        requires resource disk_1 of type DISK
+        requires resource network_1 of type NETWORK
+
+        mode configuration_0i1_0i0m0 {
+            requiring cpu_0.frequency >= 2540
+            requiring cpu_1.frequency >= 2540
+            requiring cpu_2.frequency >= 2540
+            requiring cpu_3.frequency >= 2540
+            requiring ram_1.total >= 5708
+            requiring disk_1.total >= 11314
+            requiring network_1.throughput >= 87018
+            providing compute_resource_0.flops = (((cpu_0.frequency+cpu_1.frequency)+cpu_2.frequency)+cpu_3.frequency)
+            providing quality = 36
+            providing energy = ((0.77*(size^2))+(0.8*compute_resource_0.flops))
+        }
+        mode configuration_0i1_0i0m1 {
+            requiring cpu_0.frequency >= 2303
+            requiring cpu_1.frequency >= 2303
+            requiring cpu_2.frequency >= 2303
+            requiring cpu_3.frequency >= 2303
+            requiring ram_1.total >= 13297
+            requiring disk_1.total >= 15689
+            requiring network_1.throughput >= 2820
+            providing compute_resource_0.flops = (((cpu_0.frequency+cpu_1.frequency)+cpu_2.frequency)+cpu_3.frequency)
+            providing quality = 54
+            providing energy = ((0.21*(size^2))+(0.92*compute_resource_0.flops))
+        }
+    }
+}
+
+component component_0i1_1 {
+    contract implementation_0i1_1i0 {
+        requires resource compute_resource_0 of type ComputeNode
+        requires resource cpu_0 of type CPU
+        requires resource cpu_1 of type CPU
+        requires resource cpu_2 of type CPU
+        requires resource cpu_3 of type CPU
+        requires resource ram_1 of type RAM
+        requires resource disk_1 of type DISK
+        requires resource network_1 of type NETWORK
+
+        mode configuration_0i1_1i0m0 {
+            requiring cpu_0.frequency >= 1941
+            requiring cpu_1.frequency >= 1941
+            requiring cpu_2.frequency >= 1941
+            requiring cpu_3.frequency >= 1941
+            requiring ram_1.total >= 6327
+            requiring disk_1.total >= 6875
+            requiring network_1.throughput >= 99879
+            providing compute_resource_0.flops = (((cpu_0.frequency+cpu_1.frequency)+cpu_2.frequency)+cpu_3.frequency)
+            providing quality = 6
+            providing energy = ((0.67*(size^2))+(0.4*compute_resource_0.flops))
+        }
+        mode configuration_0i1_1i0m1 {
+            requiring cpu_0.frequency >= 2896
+            requiring cpu_1.frequency >= 2896
+            requiring cpu_2.frequency >= 2896
+            requiring cpu_3.frequency >= 2896
+            requiring ram_1.total >= 15404
+            requiring disk_1.total >= 4378
+            requiring network_1.throughput >= 94766
+            providing compute_resource_0.flops = (((cpu_0.frequency+cpu_1.frequency)+cpu_2.frequency)+cpu_3.frequency)
+            providing quality = 27
+            providing energy = ((0.47*(size^2))+(0.11*compute_resource_0.flops))
+        }
+    }
+}
+
+request component_0 {
+    meta size = 6
+    requiring quality >= 35
+}
+minimize sum(energy)

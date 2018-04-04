@@ -1,0 +1,24 @@
+aspect Clauses {
+
+  uncache Clause.checkUsing(Assignment assignment);
+  syn boolean Clause.checkUsing(Assignment assignment) {
+    double leftSide = getDesignator().evalUsing(assignment);
+    double rightSide = getExpression().evalUsing(assignment);
+    switch (getClauseComparator()) {
+      case LT:
+        return leftSide < rightSide;
+      case LE:
+        return leftSide <= rightSide;
+      case EQ:
+        return leftSide == rightSide;
+      case NE:
+        return leftSide != rightSide;
+      case GE:
+        return leftSide >= rightSide;
+      case GT:
+        return leftSide > rightSide;
+    }
+    throw new RuntimeException("Unknown clause comparator. This should never happen!");
+  }
+
+}

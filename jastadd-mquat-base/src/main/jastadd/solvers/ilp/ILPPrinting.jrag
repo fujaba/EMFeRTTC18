@@ -1,0 +1,74 @@
+aspect ILPPrinting {
+
+  syn IlpString ILP.printIlp() {
+    IlpString result = new IlpString();
+    result.append(getIlpObjective().printIlp()).lb();
+    result.append("Subject To").lb();
+    for (IlpConstraint c : getIlpConstraintList()) {
+      result.append(c.printIlp()).lb();
+    }
+    result.append("Bounds").lb();
+    for (IlpBound b : getIlpBoundList()) {
+      result.append(b.printIlp()).lb();
+    }
+    // TODO check if "Generals" is always correct
+    result.append("Generals").lb();
+    for (IlpVariable v : getIlpVariableList()) {
+      result.append(v.getName()).append(" ");
+    }
+    return result.lb().append("End").lb();
+  }
+
+  syn IlpString IlpObjective.printIlp() {
+    IlpString result = new IlpString();
+    switch(getKind()) {
+      case MAXIMIZE: result.append("Maximize"); break;
+      case MINIMIZE: result.append("Minimize"); break;
+    }
+    return result.lb().append(getIlpLeftHandSide().printIlp());
+  }
+
+  syn IlpString IlpConstraint.printIlp() {
+    IlpString result = new IlpString();
+    result.append(getName()).append(": ").append(getIlpLeftHandSide().printIlp()).append(" ");
+    switch (getClauseComparator()) {
+      case LT: result.append("<"); break;
+      case LE: result.append("<="); break;
+      case EQ: result.append("="); break;
+      case NE: result.append("!="); break;
+      case GE: result.append(">="); break;
+      case GT: result.append(">"); break;
+    }
+    return result.append(" ").append(getRightHandSide());
+  }
+
+  syn IlpString IlpBound.printIlp() {
+    IlpString result = new IlpString();
+    switch(getType()) {
+      case BINARY: result.append("0 <= ").append(getRef().getName()).append(" <= 1"); break;
+      case ZERO: result.append(getRef().getName()).append(" = 0"); break;
+      case GREATER_EQUAL_ZERO: result.append("0 <= ").append(getRef().getName()); break;
+      default: logger.error("Unknown IlpBound type {}", getType().toString());
+    }
+    return result;
+  }
+
+  syn IlpString IlpLeftHandSide.printIlp() {
+    IlpString result = new IlpString();
+    for (IlpTerm t : getIlpTermList()) {
+      if (t.getValue() >= 0) {
+        result.append(" +");
+      } else {
+        result.append(" ");
+      }
+      if (t.getValue() == -1) {
+        result.append("-");
+      } else if (t.getValue() != 1) {
+        result.append(t.getValue());
+      }
+      result.append(" ").append(t.getRef().getName());
+    }
+    return result;
+  }
+
+}

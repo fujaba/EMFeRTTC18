@@ -1,0 +1,4 @@
+Solution ::= <Model:Root> Assignment* ;
+Assignment ::= <TopLevel:boolean> <Request:Request> <Implementation:Implementation> ResourceMapping ComponentMapping* ;
+ResourceMapping ::= <Instance:Instance> <Resource:Resource> ResourceMapping* ;
+ComponentMapping ::= <Instance:Instance> Assignment ;

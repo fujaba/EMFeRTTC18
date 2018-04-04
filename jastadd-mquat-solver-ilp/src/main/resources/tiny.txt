@@ -1,0 +1,84 @@
+// Expected solution
+// config_0i0m0 -> r0 + cpu0_0
+// config_1i0m0 -> r1 + cpu0_1
+
+container resource type ComputeNode {
+    resource type CPU {
+        static property frequency [Hz]
+        runtime property load [%]
+    }
+    derived property flops [ops/s]
+    runtime property STATE []
+}
+resource r0:ComputeNode {
+    resource cpu0_0:CPU {
+        frequency = 2930
+        load = 30
+    }
+    flops = 293000
+}
+resource r1:ComputeNode {
+    resource cpu1_0:CPU {
+        frequency = 930
+        load = 10
+    }
+    flops = 93000
+}
+meta size
+runtime property energy [J]
+runtime property quality [%]
+
+component c0 {
+    using property quality
+    contract impl0i0 {
+        requires component other of type c1
+        requires resource compute_resource_0 of type ComputeNode
+        requires resource cpu_1 of type CPU
+        requiring other.quality >= 95
+        mode config_0i0m0 {
+            // can run only on r0
+            requiring cpu_1.frequency >= 2159
+            providing quality = 300
+            providing energy = ((0.59*(size^2))+(0.89*compute_resource_0.flops))
+        }
+        mode config_0i0m1 {
+            // not satisfied at all
+            requiring cpu_1.frequency >= 14159
+            providing quality = 90
+            providing energy = ((0.11*(size^2))+(0.94*compute_resource_0.flops))
+        }
+    }
+}
+
+component c1 {
+    using property quality
+    contract impl1i0 {
+        requires resource compute_resource_0 of type ComputeNode
+        requires resource cpu_1 of type CPU
+        mode config_1i0m0 {
+            // can run on both, r0 and r1
+            requiring cpu_1.load <= 80
+            // fulfills c0 requirement
+            providing quality = 1004
+            providing energy = ((0.45*(size^2))+(0.34*compute_resource_0.flops))
+        }
+        mode config_1i0m1 {
+            // could run on r1
+            requiring cpu_1.load <= 20
+            // does not fulfill c0 requirement
+            providing quality = 3
+            providing energy = ((0.25*(size^2))+(0.34*compute_resource_0.flops))
+        }
+        mode config_1i0m2 {
+            // not satisfied at all
+            requiring cpu_1.load <= 1
+            providing quality = 200
+            providing energy = ((0.02*(size^2))+(0.71*compute_resource_0.flops))
+        }
+    }
+}
+request c0 {
+    meta size = 6
+    requiring quality >= 35
+}
+minimize sum(energy)

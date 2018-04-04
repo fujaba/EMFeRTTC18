@@ -1,0 +1,22 @@
+aspect Enums {
+	public enum PropertyAggregation {
+		SUM,
+		MAX
+	}
+
+	public enum ClauseType {
+    REQUIRING,
+    PROVIDING
+	}
+
+	public enum ClauseComparator {
+    LT { public String symbol() { return "<";  } },
+    LE { public String symbol() { return "<="; } },
+    EQ { public String symbol() { return "=";  } },
+    NE { public String symbol() { return "!="; } },
+    GE { public String symbol() { return ">="; } },
+    GT { public String symbol() { return ">";  } };
+
+    public String symbol() { throw new AbstractMethodError(); }
+	}
+}

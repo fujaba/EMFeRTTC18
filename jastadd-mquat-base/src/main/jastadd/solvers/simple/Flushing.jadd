@@ -1,0 +1,14 @@
+aspect Flushing {
+
+  // /**
+  //  * required for jastadd with caching
+  //  */
+  // public void Assignment.flushAssignmentUpwards() {
+  //   if (this.getParent() instanceof Assignment) {
+  //     Assignment parent = (Assignment) this.getParent();
+  //     parent.flushAssignmentUpwards();
+  //   }
+  //   flushCache();
+  // }
+
+}

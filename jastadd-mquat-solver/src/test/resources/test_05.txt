@@ -1,0 +1,233 @@
+// One request, target component requires two different components, each requiring two other components
+//  Also more resources than needed
+// Expected solution
+// Request0:
+//  configA0 ->         r0 + cpu0_0
+//   |- configB0 ->     r1 + cpu1_0
+//   |   |- configC0 -> r4 + cpu1_0
+//   |   |- configD0 -> r3 + cpu1_0
+//   |- configE0 ->     r2 + cpu2_0
+//   |   |- configF0 -> r5 + cpu2_0
+//   |   |- configG0 -> r6 + cpu2_0
+
+container resource type ComputeNode {
+    resource type CPU {
+        property frequency [Hz]
+        property load [%]
+    }
+    property flops [ops/s]
+    property STATE []
+}
+resource r0:ComputeNode { resource cpu0_0:CPU { frequency = 2930 load = 30 } flops =   3000 }
+resource r1:ComputeNode { resource cpu1_0:CPU { frequency =  930 load = 10 } flops =   3100 }
+resource r2:ComputeNode { resource cpu2_0:CPU { frequency =  930 load =  2 } flops =   3200 }
+resource r3:ComputeNode { resource cpu0_0:CPU { frequency = 2430 load = 30 } flops =   3300 }
+resource r4:ComputeNode { resource cpu0_0:CPU { frequency = 1830 load = 40 } flops =   3400 }
+resource r5:ComputeNode { resource cpu0_0:CPU { frequency =  430 load =  5 } flops =   3500 }
+resource r6:ComputeNode { resource cpu0_0:CPU { frequency = 3330 load = 30 } flops =   3600 }
+resource r7:ComputeNode { resource cpu0_0:CPU { frequency = 4230 load = 75 } flops = 423000 }
+
+meta size
+property energy [J]
+property quality [%]
+
+component A {
+    using property quality
+    contract configA0 {
+        // can run only on r0, r3, r6, r7
+        requires component beta of type B
+        requires component epsilon of type E
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring beta.quality >= 95
+        requiring epsilon.quality >= 55
+        requiring compute_resource_0.cpu_1.frequency >= 2159
+        providing quality = 300
+        providing energy = (((0.59*(size^2))+(0.89*compute_resource_0.flops))+compute_resource_0.cpu_1.frequency)
+    }
+    contract configA1 {
+        // not satisfied at all
+        requires component beta of type B
+        requires component epsilon of type E
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring beta.quality >= 95
+        requiring epsilon.quality >= 55
+        requiring compute_resource_0.cpu_1.frequency >= 14159
+        providing quality = 90
+        providing energy = ((0.11*(size^2))+(0.34*compute_resource_0.flops))
+    }
+}
+
+component B {
+    using property quality
+    contract configB0 {
+        // can run on all but r7
+        requires component chi of type C
+        requires component delta of type D
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring chi.quality >= 950
+        requiring delta.quality >= 550
+        requiring compute_resource_0.cpu_1.load <= (90 / size)
+        // fulfills A requirement
+        providing quality = 1004
+        providing energy = ((0.45*(size^2))+(0.34*compute_resource_0.flops))
+    }
+    contract configB1 {
+        // could run on r1, r2, r5
+        requires component chi of type C
+        requires component delta of type D
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring chi.quality >= 950
+        requiring delta.quality >= 550
+        requiring compute_resource_0.cpu_1.load <= (20 / size)
+        // does not fulfill A requirement
+        providing quality = 3
+        providing energy = ((0.25*(size^2))+(0.14*compute_resource_0.flops))
+    }
+    contract configB2 {
+        // not satisfied at all
+        requires component chi of type C
+        requires component delta of type D
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring chi.quality >= 950
+        requiring delta.quality >= 550
+        requiring compute_resource_0.cpu_1.load <= (1 / size)
+        // would fulfill A requirement
+        providing quality = 200
+        providing energy = ((0.02*(size^2))+(0.11*compute_resource_0.flops))
+    }
+}
+
+component C {
+    using property quality
+    contract configC0 {
+        // can run only on r0, r3, r4, r6,r7
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring compute_resource_0.cpu_1.frequency >= 1759
+        providing quality = 3000
+        providing energy = ((0.59*(size^2))+(0.89*compute_resource_0.flops))
+    }
+    contract configC1 {
+        // not satisfied at all
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring compute_resource_0.cpu_1.frequency >= 14159
+        providing quality = 900
+        providing energy = ((0.11*(size^2))+(0.34*compute_resource_0.flops))
+    }
+}
+
+component D {
+    using property quality
+    contract configD0 {
+        // can run only on r0, r3, r6,r7
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring compute_resource_0.cpu_1.frequency >= 2159
+        providing quality = 3000
+        providing energy = ((0.59*(size^2))+(0.89*compute_resource_0.cpu_1.frequency))
+    }
+    contract configD1 {
+        // not satisfied at all
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring compute_resource_0.cpu_1.frequency >= 14159
+        providing quality = 90
+        providing energy = ((0.11*(size^2))+(0.34*compute_resource_0.cpu_1.frequency))
+    }
+}
+
+component E {
+    using property quality
+    contract configE0 {
+        // can run only on r1, r2, r5
+        requires component phi of type F
+        requires component gamma of type G
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring phi.quality >= 9500
+        requiring gamma.quality >= 5500
+        requiring compute_resource_0.cpu_1.frequency <= 1500
+        requiring compute_resource_0.cpu_1.load <= (size + 4)
+        providing quality = 70
+        providing energy = ((0.59*(size^2))+(0.89*compute_resource_0.flops))
+    }
+    contract configE1 {
+        // not satisfied at all
+        requires component phi of type F
+        requires component gamma of type G
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring phi.quality >= 9500
+        requiring gamma.quality >= 5500
+        requiring compute_resource_0.cpu_1.frequency >= 14159
+        providing quality = 90
+        providing energy = ((0.11*(size^2))+(0.14*compute_resource_0.flops))
+    }
+}
+
+component F {
+    using property quality
+    contract configF0 {
+        // can run only on r1, r2, r5
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring compute_resource_0.cpu_1.frequency <= 1159
+        providing quality = 30000
+        providing energy = (((0.59*(size^2))+(0.89*compute_resource_0.flops))+(2*compute_resource_0.cpu_1.frequency))
+    }
+    contract configF1 {
+        // not satisfied at all
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring compute_resource_0.cpu_1.frequency >= 14159
+        providing quality = 90
+        providing energy = ((0.11*(size^2))+(0.34*compute_resource_0.flops))
+    }
+}
+
+component G {
+    using property quality
+    contract configG0 {
+        // can run only on r0, r3, r6,r7
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring compute_resource_0.cpu_1.frequency >= 2159
+        providing quality = 30000
+        providing energy = ((0.59*(size^2))+(0.89*compute_resource_0.flops))
+    }
+    contract configG1 {
+        // not satisfied at all
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring compute_resource_0.cpu_1.frequency >= 14159
+        providing quality = 90
+        providing energy = ((0.11*(size^2))+(0.34*compute_resource_0.flops))
+    }
+}
+
+request A {
+    meta size = 2
+    requiring quality >= 35
+}
+minimize sum(energy)

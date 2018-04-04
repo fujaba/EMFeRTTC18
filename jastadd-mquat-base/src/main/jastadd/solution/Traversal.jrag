@@ -1,0 +1,55 @@
+aspect Traversal {
+
+  uncache Assignment.mappedAssignment(Instance instance);
+  syn Assignment Assignment.mappedAssignment(Instance instance) {
+    for (ComponentMapping mapping : getComponentMappingList()) {
+      if (mapping.getInstance() == instance) {
+        return mapping.getAssignment();
+      }
+    }
+    return null;
+  }
+
+  uncache Assignment.mappedResource(Instance instance);
+  syn Resource Assignment.mappedResource(Instance instance) {
+    return getResourceMapping().mappedResource(instance);
+  }
+
+  syn Resource ResourceMapping.mappedResource(Instance instance) {
+    if (this.getInstance() == instance) {
+      return this.getResource();
+    } else {
+      for (ResourceMapping subMapping : this.getResourceMappingList()) {
+        Resource result = subMapping.mappedResource(instance);
+        if (result != null) {
+          return result;
+        }
+      }
+      return null;
+    }
+  }
+
+  syn java.util.List<Assignment> Assignment.allAssignments() {
+    ArrayList<Assignment> allAssignments = new ArrayList<>();
+    allAssignments.add(this);
+    for (ComponentMapping mapping : getComponentMappingList()) {
+      allAssignments.addAll(mapping.getAssignment().allAssignments());
+    }
+    return Collections.unmodifiableList(allAssignments);
+  }
+
+  // everything related to solution must not be cached
+  uncache Solution.allAssignments();
+  syn java.util.List<Assignment> Solution.allAssignments() {
+    ArrayList<Assignment> allAssignments = new ArrayList<>();
+    for (Assignment assignment : getAssignments()) {
+      allAssignments.addAll(assignment.allAssignments());
+    }
+    return Collections.unmodifiableList(allAssignments);
+  }
+
+  syn Resource Assignment.getResource() {
+    return getResourceMapping().getResource();
+  }
+
+}

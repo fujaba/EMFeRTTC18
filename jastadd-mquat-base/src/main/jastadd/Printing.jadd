@@ -1,0 +1,90 @@
+aspect Printing {
+
+  public String ASTNode.toString(){
+    return print(new MquatWriteSettings("")).toString();
+  }
+
+  public class MquatString {
+    boolean newline;
+    StringBuilder buffer;
+    MquatWriteSettings settings;
+    int indentationLevel;
+
+    public MquatString(MquatWriteSettings settings, int indentationLevel) {
+      this.buffer = new java.lang.StringBuilder();
+      this.settings = settings;
+      this.indentationLevel = indentationLevel;
+      this.newline = false;
+    }
+
+    public int getIndentationLevel() {
+      return this.indentationLevel;
+    }
+
+    public MquatString ind() {
+      this.indentationLevel += 1;
+      return this;
+    }
+
+    public MquatString und() {
+      if (this.indentationLevel > 0) this.indentationLevel -= 1;
+      return this;
+    }
+
+    private void flushNewline() {
+      if (newline) {
+        this.buffer.append("\n");
+        for (int i = 0; i < indentationLevel; i++) {
+          this.buffer.append(settings.getIndentString());
+        }
+        newline = false;
+      }
+    }
+
+    public MquatString lb() {
+      this.newline = true;
+      return this;
+    }
+
+    public MquatString append(Object o) {
+      flushNewline();
+      buffer.append(o);
+      return this;
+    }
+
+
+    public MquatString append(final MquatString s) {
+      flushNewline();
+
+      buffer.append(s.getBuffer());
+      if (s.newlinePending()) {
+        newline = true;
+      }
+      return this;
+    }
+
+    protected boolean newlinePending() {
+      return newline;
+    }
+
+    public StringBuilder getBuffer() {
+      return buffer;
+    }
+
+    public String toString() {
+      flushNewline();
+      return buffer.toString();
+    }
+  }
+
+  public class MquatWriteSettings {
+    String indentString;
+
+    public MquatWriteSettings(String indentString) {
+      this.indentString = indentString;
+    }
+    public String getIndentString() {
+      return this.indentString;
+    }
+  }
+}

@@ -1,0 +1,56 @@
+aspect Printing {
+
+  public MquatString Solution.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+    result.append("solution {").lb().ind();
+    for (Assignment assignment : getAssignmentList()) {
+      result.append(assignment.print(settings, indentationLevel + 1)).lb();
+    }
+    return result.und().lb().append("}").lb();
+  }
+
+  public MquatString Assignment.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+    if (getTopLevel()) {
+      result.append(getRequest() == null ? "<no request>" : getRequest().name());
+    } // otherwise the instance name was already printed
+    result.append(" -> ")
+        .append(getImplementation() == null ? "<no impl>" : getImplementation().name())
+        .append(" {").lb().ind();
+    result.append(getResourceMapping().print(settings, indentationLevel + 1));
+    for (ComponentMapping entry : getComponentMappingList()) {
+      result.append(entry.print(settings, indentationLevel + 1));
+    }
+    result.und().lb().append("}");
+
+    return result;
+  }
+
+  public MquatString ResourceMapping.print(MquatWriteSettings settings, int indentationLevel) {
+    MquatString result = new MquatString(settings, indentationLevel);
+    result.append(getInstance() == null ? "<no instance>" : getInstance().name())
+        .append(" -> ").append((getResource() == null) ? "<no resource>" : getResource().name());
+    if (getNumResourceMapping() > 0) {
+      result.append(" {").lb().ind();
+      for (ResourceMapping subMapping : getResourceMappingList()) {
+        result.append(subMapping.print(settings, indentationLevel));
+      }
+      result.und().append("}").lb();
+    } else {
+      result.lb();
+    }
+    return result;
+  }
+
+  public MquatString ComponentMapping.print(MquatWriteSettings settings, int indentationLevel){
+    MquatString result = new MquatString(settings, indentationLevel);
+    result.append(getInstance() == null ? "<no instance>" : getInstance().name());
+    result.append((getAssignment() == null) ? "<no assignment>" : getAssignment().print(settings, indentationLevel));
+    return result.lb();
+  }
+
+  public String Assignment.name() {
+    return "Assignment@" + Integer.toHexString(hashCode());
+  }
+
+}

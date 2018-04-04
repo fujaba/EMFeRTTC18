@@ -1,0 +1,16 @@
+aspect Navigation {
+
+  // upwards search ====================================================================================================
+
+  //--- containingComponentMapping ---//
+
+  inh ComponentMapping Assignment.containingComponentMapping();
+  eq ComponentMapping.getAssignment().containingComponentMapping() = this;
+  eq Solution.getAssignment(int i).containingComponentMapping() = null;
+
+  //--- containingAssignment ---//
+
+  inh Assignment ComponentMapping.containingAssignment();
+  eq Assignment.getComponentMapping(int i).containingAssignment() = this;
+
+}

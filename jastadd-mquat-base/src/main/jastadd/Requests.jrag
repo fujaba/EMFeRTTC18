@@ -1,0 +1,53 @@
+aspect Requests {
+
+  //--- getName ---//
+
+  inh Name Request.getName();
+  eq Root.getRequest(int i).getName() {
+    return new Name("request" + String.valueOf(i));
+  }
+
+//  //--- relevantImplementations ---//
+//
+//  /** Implementations of target component and all possibly required implementations */
+//  syn java.util.List<Implementation> Request.relevantImplementations() {
+//    java.util.List<Implementation> result = new java.util.ArrayList<>();
+//    for (Component comp : relevantComponents()) {
+//      for (Implementation impl: comp.getImplementationList()) {
+//        result.add(impl);
+//      };
+//    }
+//    return result;
+//  }
+
+  //--- relevantComponents ---//
+
+  /** Target component and all possibly required components */
+  syn java.util.Set<Component> Request.relevantComponents() {
+    return getTarget().getRef().relevantComponents();
+  }
+
+  /** This component and all possibly required components */
+  syn java.util.Set<Component> Component.relevantComponents() {
+    java.util.Set<Component> result = new java.util.HashSet<>();
+    result.add(this);
+    for (Implementation impl : getImplementationList()) {
+      for (ComponentRequirement cr : impl.getComponentRequirementList()) {
+        result.addAll(cr.getComponentRef().getRef().relevantComponents());
+      }
+    }
+    return result;
+  }
+
+    //--- getMetaParameterExpression ---//
+
+  syn LiteralExpression Request.getMetaParameterExpression(MetaParameter meta) {
+    for (MetaParameterAssignment assignment : getMetaParameterAssignmentList()) {
+      if (assignment.getMetaParameterRef().getRef().equals(meta)) {
+        return assignment.getLiteralExpression();
+      }
+    }
+    return null;
+  }
+
+}

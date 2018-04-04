@@ -1,0 +1,115 @@
+// Two requests, two components, first requires second one, request target different one
+//  Using metaparameter size in clauses with different values in requests
+// Expected solution
+// Request0:
+//  config_0i0m0 -> r0 + cpu0_0
+//  config_1i0m0 -> r1 + cpu1_0
+// Request1:
+//  config_1i0m0 -> r2 + cpu2_0
+
+container resource type ComputeNode {
+    resource type CPU {
+        property frequency [Hz]
+        property load [%]
+    }
+    property flops [ops/s]
+    property STATE []
+}
+resource r0:ComputeNode {
+    resource cpu0_0:CPU {
+        frequency = 2930
+        load = 30
+    }
+    flops = 293000
+}
+resource r1:ComputeNode {
+    resource cpu1_0:CPU {
+        frequency = 930
+        load = 10
+    }
+    flops = 93000
+}
+resource r2:ComputeNode {
+    resource cpu2_0:CPU {
+        frequency = 930
+        load = 2
+    }
+    flops = 93000
+}
+meta size
+property energy [J]
+property quality [%]
+
+component c0 {
+    using property quality
+    contract config_0i0m0 {
+        // can run only on r0
+        requires component other of type c1
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring other.quality >= 95
+        requiring compute_resource_0.cpu_1.frequency >= 2159
+        providing quality = 300
+        providing energy = ((0.59*(size^2))+(0.89*compute_resource_0.flops))
+    }
+    contract config_0i0m1 {
+        // not satisfied at all
+        requires component other of type c1
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring other.quality >= 95
+        requiring compute_resource_0.cpu_1.frequency >= 14159
+        providing quality = 90
+        providing energy = ((0.11*(size^2))+(0.94*compute_resource_0.flops))
+    }
+}
+
+component c1 {
+    using property quality
+    contract config_1i0m0 {
+        // req0: can run on all
+        // req1: can only run on r2
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring compute_resource_0.cpu_1.load <= (90 / size)
+        // req0: fulfills c0 requirement
+        // req1: fulfills req requirement
+        providing quality = 1004
+        providing energy = ((0.45*(size^2))+(0.34*compute_resource_0.flops))
+    }
+    contract config_1i0m1 {
+        // req0: could run on r1
+        // req1: can not run on any
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring compute_resource_0.cpu_1.load <= (20 / size)
+        // req0: does not fulfill c0 requirement
+        // req1: does not fulfill req requirement
+        providing quality = 3
+        providing energy = ((0.25*(size^2))+(0.34*compute_resource_0.flops))
+    }
+    contract config_1i0m2 {
+        // req0: not satisfied at all
+        requires resource compute_resource_0 of type ComputeNode with {
+            cpu_1 of type CPU
+        }
+        requiring compute_resource_0.cpu_1.load <= (1 / size)
+        // req0: would fulfill c0 requirement
+        // req1: would fulfill req requirement
+        providing quality = 200
+        providing energy = ((0.02*(size^2))+(0.71*compute_resource_0.flops))
+    }
+}
+request c0 {
+    meta size = 1
+    requiring quality >= 35
+}
+request c1 {
+    meta size = 40
+    requiring quality >= 35
+}
+minimize sum(energy)

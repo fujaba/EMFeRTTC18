@@ -1,0 +1,42 @@
+{
+  "kind": "normal",
+  "path": "results",
+  "resultFilePattern": "benchmark-%(date)s.csv",
+  "modelFilePattern": "model-%(date)s-%(id)s.txt",
+  "solutionFilePattern": "sol-%(date)s-%(id)s-%(solver)s.txt",
+  "solvers": [
+//    "ilp-direct",
+//    "ilp-external",
+//    "mh-naive",
+    "simple"
+  ],
+  "logLevel": "debug",
+  "basic": {
+    "verbose": true,
+    "minTopLevelComponents": 1,
+    "maxTopLevelComponents": 1,
+    "minAvgNumImplSubComponents": 1,
+    "maxAvgNumImplSubComponents": 1,
+    "minImplSubComponentDerivation": 0,
+    "maxImplSubComponentDerivation": 0,
+    "minAvgNumCompSubComponents": 0,
+    "maxAvgNumCompSubComponents": 0,
+    "minCompSubComponentDerivation": 0,
+    "maxCompSubComponentDerivation": 0,
+    "minComponentDepth": 3,
+    "maxComponentDepth": 3,
+    "minNumImplementations": 3,
+    "maxNumImplementations": 3,
+    "minRequests": 2,
+    "maxRequests": 3,
+    "stepRequests": 1,
+    "minCpus": 1,
+    "maxCpus": 1,
+    "minResourceRatio": 1.5,
+    "maxResourceRatio": 1.5,
+    "stepResourceRatio": 0.5,
+    "timeoutValue": 120,
+    "timeoutUnit": "SECONDS",
+    "seed": 0
+  }
+}

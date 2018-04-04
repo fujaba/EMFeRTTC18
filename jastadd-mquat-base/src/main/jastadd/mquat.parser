@@ -1,0 +1,335 @@
+%header {:
+package de.tudresden.inf.st.mquat.jastadd.parser;
+import de.tudresden.inf.st.mquat.jastadd.model.*;
+import de.tudresden.inf.st.mquat.parser.MquatParserHelper;
+import java.util.Map;
+import java.util.HashMap;
+:} ;
+
+%embed {:
+  private MquatParserHelper mph = new MquatParserHelper();
+  private static <T extends ASTNode<?>> void insertZero(List<T> listNode, T child) {
+    listNode.insertChild(child, 0);
+  }
+
+
+  /**
+   * Post processing step after parsing a model, to resolve all references within the model.
+   * @throws java.util.NoSuchElementException if a reference can not be resolved
+   */
+  public void resolveReferences() {
+    mph.resolveReferences();
+  }
+
+
+  /**
+   * Post processing step after parsing a solution, to resolve all references.
+   * @param model the model to resolve the references
+   * @throws RuntimeException if assignments are malformed
+   * @throws java.util.NoSuchElementException if a reference can not be resolved
+   */
+  public void resolveSolutionReferencesWith(Root model) {
+    mph.resolveSolutionReferencesWith(model);
+  }
+:} ;
+
+%goal goal;
+%goal solution;
+
+Request request =
+    REQUEST component_ref.c LB_CURLY request_body.b RB_CURLY {: b.setTarget(c); return b; :}
+  ;
+
+Request request_body =
+    meta_parameter_assignment.m request_body.b  {: insertZero(b.getMetaParameterAssignmentList(), m); return b; :}
+  | clause.c request_body.b                     {: insertZero(b.getConstraintList(), c); return b; :}
+  | meta_parameter_assignment.m  {: return new Request(new List<>(m), null, new List<>()); :}
+  | clause.c                     {: return new Request(new List<>(), null, new List<>(c)); :}
+  ;
+
+MetaParameterAssignment meta_parameter_assignment =
+    META meta_parameter_ref.n EQ literal_expression.e {: return new MetaParameterAssignment(n, e); :}
+  ;
+
+%left RB_ROUND;
+%left MULT, DIV;
+%left PLUS, MINUS;
+%left POW;
+
+Expression expression =
+    LB_ROUND expression.a MULT  expression.b RB_ROUND     {: return new MultExpression(a, b); :}
+  | LB_ROUND expression.a DIV   expression.b RB_ROUND     {: return new DivExpression(a, b); :}
+  | LB_ROUND expression.a PLUS  expression.b RB_ROUND     {: return new AddExpression(a, b); :}
+  | LB_ROUND expression.a MINUS expression.b RB_ROUND     {: return new SubExpression(a, b); :}
+  | LB_ROUND expression.a POW expression.b RB_ROUND       {: return new PowerExpression(a, b); :}
+  | literal_expression.l                {: return l; :}
+  | designator.d                        {: return d; :}
+  | LB_ROUND expression.e RB_ROUND      {: return new ParenthesizedExpression(e); :}
+  ;
+
+LiteralExpression literal_expression =
+    INTEGER.n             {: return new LiteralExpression(Integer.parseInt(n)); :}
+  | REAL.n                {: return new LiteralExpression(Double.parseDouble(n));   :}
+  ;
+
+Objective objective =
+    MINIMIZE NAME.n LB_ROUND property_ref.p RB_ROUND
+    {:
+      if (n.equals("sum")) {
+        return new Objective(p, PropertyAggregation.SUM);
+      } else if (n.equals("maximum")) {
+        return new Objective(p, PropertyAggregation.MAX);
+      }
+    :}
+  ;
+
+Root goal =
+    hardware_model.h software_model.s request.r* objective.o  {: return new Root(h,s,r,o); :}
+  ;
+
+MetaParameter meta_parameter =
+    META name.n
+    {:
+      MetaParameter m = new MetaParameter(n);
+      mph.metaParameterMap.put(n.getName(), m);
+      return m;
+    :}
+  ;
+
+MetaParameterRef meta_parameter_ref =
+    name.n
+    {:
+      MetaParameterRef ref = new MetaParameterRef(n, null);
+      mph.metaParameterRefList.add(ref);
+      return ref;
+    :}
+  ;
+
+Name name =
+    NAME.i {: return new Name(i); :}
+  ;
+
+QualifiedName qualified_name =
+    name.n DOT qualified_name.q {: insertZero(q.getNameList(), n); return q; :}
+  | name.n                      {: List<Name> names = new List<>(); names.add(n); return new QualifiedName(names); :}
+  ;
+
+Property property =
+    PROPERTY name.n UNIT.u
+    {:
+      Property p = new Property(n, u.substring(1, u.length() - 1));
+      mph.propertyMap.put(n.getName(), p);
+      return p;
+    :}
+  ;
+
+PropertyRef property_ref =
+    name.n {: PropertyRef ref = new PropertyRef(n, null); mph.propertyRefList.add(ref); return ref; :}
+  ;
+
+SoftwareModel software_model =
+    meta_parameter.a software_model.m  {: insertZero(m.getMetaParameterList(), a); return m; :}
+  | component.c software_model.m       {: insertZero(m.getComponentList(), c); return m; :}
+  | property.p software_model.m        {: insertZero(m.getPropertyList(), p); return m; :}
+  | meta_parameter.m  {: return new SoftwareModel(new List<>(m), new List<>(), new List<>()); :}
+  | component.c       {: return new SoftwareModel(new List<>(), new List<>(c), new List<>()); :}
+  | property.p        {: return new SoftwareModel(new List<>(), new List<>(), new List<>(p)); :}
+  ;
+
+Component component =
+    COMPONENT name.n LB_CURLY component_body.r RB_CURLY
+    {:
+      r.setName(n);
+      mph.componentMap.put(n.getName(), r);
+      return r;
+    :}
+  ;
+
+Component component_body =
+    implementation.i component_body.b               {: insertZero(b.getImplementationList(), i); return b; :}
+  | property.p component_body.b                     {: insertZero(b.getPropertyList(), p); return b; :}
+  | USING PROPERTY property_ref.r component_body.b  {: insertZero(b.getPropertyRefList(), r); return b; :}
+  | implementation.i                  {: return new Component(null, new List<>(i), new List<>(), new List<>()); :}
+  | property.p                        {: return new Component(null, new List<>(), new List<>(p), new List<>()); :}
+  | USING PROPERTY property_ref.r     {: return new Component(null, new List<>(), new List<>(), new List<>(r)); :}
+  ;
+
+ComponentRef component_ref =
+    name.n {: ComponentRef ref = new ComponentRef(n, null); mph.componentRefList.add(ref); return ref; :}
+  ;
+
+HardwareModel hardware_model =
+    resource_type.r hardware_model.m  {: insertZero(m.getResourceTypeList(), r); return m;  :}
+  | resource.s hardware_model.m       {: insertZero(m.getResourceList(), s); return m; :}
+  | property.p hardware_model.m       {: insertZero(m.getPropertyList(), p); return m; :}
+  | resource_type.r                   {: return new HardwareModel(new List<>(r), new List<>(), new List<>()); :}
+  | resource.s                        {: return new HardwareModel(new List<>(), new List<>(s), new List<>()); :}
+  | property.p                        {: return new HardwareModel(new List<>(), new List<>(), new List<>(p)); :}
+  ;
+
+ResourceType resource_type =
+    RESOURCE TYPE name.n LB_CURLY resource_type_body.opt? RB_CURLY
+    {:
+      ResourceType b;
+      if (opt.getNumChild() > 0) {
+        b = (ResourceType) opt.getChild(0);
+      } else {
+        b = new ResourceType(null, false, new List<>(), new List<>(), new List<>());
+      }
+      b.setName(n);
+      b.setContainer(false);
+      mph.resourceTypeMap.put(n.getName(), b);
+      return b;
+    :}
+  | CONTAINER RESOURCE TYPE name.n LB_CURLY resource_type_body.opt? RB_CURLY
+    {:
+      ResourceType b;
+      if (opt.getNumChild() > 0) {
+        b = (ResourceType) opt.getChild(0);
+      } else {
+        b = new ResourceType(null, false, new List<>(), new List<>(), new List<>());
+      }
+      b.setName(n);
+      b.setContainer(true);
+      mph.resourceTypeMap.put(n.getName(), b);
+      return b;
+    :}
+  ;
+
+ResourceType resource_type_body =
+    resource_type.r resource_type_body.b                 {: insertZero(b.getSubTypeList(), r); return b; :}
+  | property.p resource_type_body.b                      {: insertZero(b.getPropertyList(), p); return b; :}
+  | USING PROPERTY property_ref.pr resource_type_body.b  {: insertZero(b.getPropertyRefList(), pr); return b; :}
+  | resource_type.r                 {: return new ResourceType(null, false, new List<>(r), new List<>(), new List<>()); :}
+  | property.p                      {: return new ResourceType(null, false, new List<>(), new List<>(p), new List<>()); :}
+  | USING PROPERTY property_ref.pr  {: return new ResourceType(null, false, new List<>(), new List<>(), new List<>(pr)); :}
+  ;
+
+ResourceTypeRef resource_type_ref =
+    name.n
+    {:
+      ResourceTypeRef ref = new ResourceTypeRef(n, null);
+      mph.resourceTypeRefList.add(ref);
+      return ref;
+    :}
+  ;
+
+Resource resource =
+    RESOURCE name.n COLON resource_type_ref.r LB_CURLY RB_CURLY
+    {:
+      return new Resource(n, r, new List<>(), new List<>());
+    :}
+  | RESOURCE name.n COLON resource_type_ref.r LB_CURLY resource_body.b RB_CURLY
+    {:
+      b.setName(n);
+      b.setType(r);
+      return b;
+    :}
+  ;
+
+Resource resource_body =
+    resource.r resource_body.b                {: insertZero(b.getSubResourceList(), r); return b; :}
+  | current_resource_value.v resource_body.b  {: insertZero(b.getCurrentResourceValueList(), v); return b; :}
+  | resource.r                {: return new Resource(null, null, new List<>(r), new List<>()); :}
+  | current_resource_value.v  {: return new Resource(null, null, new List<>(), new List<>(v)); :}
+  ;
+
+CurrentResourceValue current_resource_value =
+    property_ref.r EQ literal_expression.l {: return new CurrentResourceValue(r,l); :}
+  ;
+
+Implementation implementation =
+    CONTRACT name.n LB_CURLY implementation_body.b RB_CURLY {: b.setName(n); return b; :}
+  ;
+
+Instance instance =
+    name.n {: return new Instance(n); :}
+  ;
+
+List instance_list =
+    instance.i COMMA instance_list.l {: insertZero(l, i); :}
+  | instance.i {: return new List<>(i); :}
+  ;
+
+ComponentRequirement component_requirement =
+    REQUIRES COMPONENT instance_list.l OFTYPE component_ref.cr {: return new ComponentRequirement(cr, l); :}
+  ;
+
+ResourceRequirement resource_requirement =
+    REQUIRES RESOURCE instance_list.l OFTYPE resource_type_ref.rr WITH LB_CURLY inner_resource_requirement.irr* RB_CURLY {: return new ResourceRequirement(rr, l, irr); :}
+  | REQUIRES RESOURCE instance_list.l OFTYPE resource_type_ref.rr {: return new ResourceRequirement(rr, l, new List<>()); :}
+  ;
+
+ResourceRequirement inner_resource_requirement =
+    instance_list.l OFTYPE resource_type_ref.rr WITH LB_CURLY inner_resource_requirement.irr* RB_CURLY {: return new ResourceRequirement(rr, l, irr); :}
+  | instance_list.l OFTYPE resource_type_ref.rr {: return new ResourceRequirement(rr, l, new List<>()); :}
+  ;
+
+Designator designator =
+    qualified_name.n {: return new QualifiedNameDesignator(n); :}
+  ;
+
+Clause clause =
+    REQUIRING designator.d LT expression.e {: return new Clause(ClauseType.REQUIRING, d, ClauseComparator.LT, e); :}
+  | REQUIRING designator.d LE expression.e {: return new Clause(ClauseType.REQUIRING, d, ClauseComparator.LE, e); :}
+  | REQUIRING designator.d EQ expression.e {: return new Clause(ClauseType.REQUIRING, d, ClauseComparator.EQ, e); :}
+  | REQUIRING designator.d NE expression.e {: return new Clause(ClauseType.REQUIRING, d, ClauseComparator.NE, e); :}
+  | REQUIRING designator.d GE expression.e {: return new Clause(ClauseType.REQUIRING, d, ClauseComparator.GE, e); :}
+  | REQUIRING designator.d GT expression.e {: return new Clause(ClauseType.REQUIRING, d, ClauseComparator.GT, e); :}
+  | PROVIDING designator.d LT expression.e {: return new Clause(ClauseType.PROVIDING, d, ClauseComparator.LT, e); :}
+  | PROVIDING designator.d LE expression.e {: return new Clause(ClauseType.PROVIDING, d, ClauseComparator.LE, e); :}
+  | PROVIDING designator.d EQ expression.e {: return new Clause(ClauseType.PROVIDING, d, ClauseComparator.EQ, e); :}
+  | PROVIDING designator.d NE expression.e {: return new Clause(ClauseType.PROVIDING, d, ClauseComparator.NE, e); :}
+  | PROVIDING designator.d GE expression.e {: return new Clause(ClauseType.PROVIDING, d, ClauseComparator.GE, e); :}
+  | PROVIDING designator.d GT expression.e {: return new Clause(ClauseType.PROVIDING, d, ClauseComparator.GT, e); :}
+  ;
+
+Implementation implementation_body =
+    component_requirement.cr implementation_body.b  {: insertZero(b.getComponentRequirementList(), cr); return b; :}
+  | resource_requirement.rr implementation_body.b   {: b.setResourceRequirement(rr); return b; :}
+  | clause.c implementation_body.b                  {: insertZero(b.getClauseList(), c); return b; :}
+  | component_requirement.cr  {: return new Implementation(null, new List<>(cr), null, new List<>()); :}
+  | resource_requirement.rr   {: return new Implementation(null, new List<>(), rr, new List<>()); :}
+  | clause.c                  {: return new Implementation(null, new List<>(), null, new List<>(c)); :}
+  ;
+
+Solution solution =
+    SOLUTION LB_CURLY assignment.al* RB_CURLY
+    {:
+      mph.unfinishedSolution = new Solution(null, al);
+      return mph.unfinishedSolution;
+    :}
+  ;
+
+Assignment assignment =
+    NAME.i RIGHT_ARROW NAME.impl LB_CURLY resource_mapping.rm component_mapping.cml* RB_CURLY
+    {:
+      Assignment result = new Assignment(true, null, null, rm, cml);
+      mph.assignmentTerminals.put(result, new Tuple<>(i, impl));
+      return result;
+    :}
+  ;
+
+ResourceMapping resource_mapping =
+    NAME.i RIGHT_ARROW NAME.res
+    {:
+      ResourceMapping result = new ResourceMapping();
+      mph.resourceMappingTerminals.put(result, new Tuple<>(i, res));
+      return result;
+    :}
+  | NAME.i RIGHT_ARROW NAME.res LB_CURLY resource_mapping.rml* RB_CURLY
+    {:
+      ResourceMapping result = new ResourceMapping(null, null, rml);
+      mph.resourceMappingTerminals.put(result, new Tuple<>(i, res));
+      return result;
+    :}
+  ;
+
+ComponentMapping component_mapping =
+    assignment.a
+    {:
+      a.setTopLevel(false);
+      ComponentMapping result = new ComponentMapping(null, a);
+      return result;
+    :}
+  ;

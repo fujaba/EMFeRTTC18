@@ -1,0 +1,25 @@
+aspect Helpers {
+
+  public java.util.Collection<T> List.asJavaCollection() {
+    java.util.List<T> javaList = new java.util.ArrayList();
+    for (T child : this) {
+      javaList.add(child);
+    }
+    return javaList;
+  }
+
+  public int ASTNode.posInParent() {
+    if (getParent() == null) {
+      throw new RuntimeException();
+    } else {
+      return getParent().getIndexOfChild(this);
+    }
+  }
+
+  public ASTNode[] List.toArray() {
+    ASTNode[] result = new ASTNode[numChildren];
+    System.arraycopy(children, 0, result, 0, numChildren);
+    return result;
+  }
+
+}

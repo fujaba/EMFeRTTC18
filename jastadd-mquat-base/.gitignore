@@ -1,0 +1,9 @@
+out/
+.gradle
+src/gen
+src/gen-res
+build
+coverage
+/bin/
+/build/
+/out/

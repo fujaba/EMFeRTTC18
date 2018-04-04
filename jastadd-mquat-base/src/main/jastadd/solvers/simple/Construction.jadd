@@ -1,0 +1,56 @@
+aspect Construction {
+
+  /**
+   * Create a solution with no assignments and every resource in the model marked as free in the solution
+   *
+   * @param model the model to base the solution on
+   * @return a newly created solution, with not assignments
+   */
+  public static Solution Solution.emptySolutionOf(Root model) {
+    return new Solution(model,new List<>());
+  }
+
+  /**
+   * creates an assignment for the model given by the solution within it is called
+   *
+   * @param request
+   * @param component
+   * @return
+   */
+  public Assignment Solution.createSoftwareAssignment(Request request, Component component, boolean topLevel) {
+    Assignment assignment = new Assignment();
+    assignment.setRequest(request);
+    assignment.setTopLevel(topLevel);
+
+    // ignore resources here
+
+    // find the first impl
+    Implementation implementation = component.getImplementation(0);
+    assignment.setImplementation(implementation);
+
+    for (ComponentRequirement requirement : implementation.getComponentRequirementList()) {
+      for (Instance instance : requirement.getInstanceList()) {
+        assignment.addComponentMapping(new ComponentMapping(instance, createSoftwareAssignment(request, requirement.getComponentRef().getRef(), false)));
+      }
+    }
+
+    for (Instance instance : implementation.getResourceRequirement().getInstanceList()) {
+      assignment.setResourceMapping(new ResourceMapping(instance, null, new List<>()));
+    }
+
+    return assignment;
+  }
+
+  public static Solution Solution.createSoftwareSolution(Root model) {
+    Solution solution = new Solution();
+
+    solution.setModel(model);
+
+    for (Request request : model.getRequests()) {
+      solution.addAssignment(solution.createSoftwareAssignment(request, request.getTarget().getRef(), true));
+    }
+
+    return solution;
+  }
+
+}

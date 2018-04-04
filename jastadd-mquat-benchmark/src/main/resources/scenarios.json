@@ -1,0 +1,119 @@
+{
+  "path": "results",
+  "logLevel": "info",
+  "solvers": [
+    "ilp-direct"
+//    "ilp-external",
+//    "simple"
+  ],
+  "timeoutValue": 15,
+  "timeoutUnit": "MINUTES",
+  "seed": 0,
+//  "repetitions": 10,
+  "scenarios": [
+    {
+      "id": 0,
+      "name": "trivial",
+      "variants": 1,
+      "requests": 1,
+      "depth": 1,
+      "resources": 1
+    },
+    {
+      "id": 1,
+      "name": "small",
+      "variants": 2,
+      "requests": 1,
+      "depth": 2,
+      "resources": 1.5
+    },
+    {
+      "id": 2,
+      "name": "medium",
+      "variants": 10,
+      "requests": 15,
+      "depth": 2,
+      "resources": 1.5
+    },
+    {
+      "id": 3,
+      "name": "large",
+      "variants": 20,
+      "requests": 20,
+      "depth": 2,
+      "resources": 1.5
+    },
+    {
+      "id": 4,
+      "name": "huge",
+      "variants": 50,
+      "requests": 50,
+      "depth": 2,
+      "resources": 1.5
+    },
+    {
+      "id": 5,
+      "name": "small-many-hw",
+      "variants": 2,
+      "requests": 1,
+      "depth": 2,
+      "resources": 5
+    },
+    {
+      "id": 6,
+      "name": "medium-many-hw",
+      "variants": 10,
+      "requests": 15,
+      "depth": 2,
+      "resources": 5
+    },
+    {
+      "id": 7,
+      "name": "large-many-hw",
+      "variants": 20,
+      "requests": 20,
+      "depth": 2,
+      "resources": 5
+    },
+    {
+      "id": 8,
+      "name": "huge-many-hw",
+      "variants": 50,
+      "requests": 50,
+      "depth": 2,
+      "resources": 5
+    },
+    {
+      "id": 9,
+      "name": "small-complex-sw",
+      "variants": 2,
+      "requests": 1,
+      "depth": 5,
+      "resources": 1.5
+    },
+    {
+      "id": 10,
+      "name": "medium-complex-sw",
+      "variants": 5,
+      "requests": 10,
+      "depth": 5,
+      "resources": 1.5
+    },
+    {
+      "id": 11,
+      "name": "large-complex-sw",
+      "variants": 10,
+      "requests": 20,
+      "depth": 5,
+      "resources": 1.5
+    },
+    {
+      "id": 12,
+      "name": "huge-complex-sw",
+      "variants": 20,
+      "requests": 50,
+      "depth": 5,
+      "resources": 1.5
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+aspect Logging {
+
+  protected static final org.apache.logging.log4j.Logger AddExpression.logger = org.apache.logging.log4j.LogManager.getLogger(AddExpression.class);
+  protected static final org.apache.logging.log4j.Logger Assignment.logger = org.apache.logging.log4j.LogManager.getLogger(Assignment.class);
+  protected static final org.apache.logging.log4j.Logger ASTNode.logger = org.apache.logging.log4j.LogManager.getLogger(ASTNode.class);
+  protected static final org.apache.logging.log4j.Logger Clause.logger = org.apache.logging.log4j.LogManager.getLogger(Clause.class);
+  protected static final org.apache.logging.log4j.Logger Component.logger = org.apache.logging.log4j.LogManager.getLogger(Component.class);
+  protected static final org.apache.logging.log4j.Logger ComponentMapping.logger = org.apache.logging.log4j.LogManager.getLogger(ComponentMapping.class);
+  protected static final org.apache.logging.log4j.Logger ComponentRequirement.logger = org.apache.logging.log4j.LogManager.getLogger(ComponentRequirement.class);
+  protected static final org.apache.logging.log4j.Logger CurrentResourceValue.logger = org.apache.logging.log4j.LogManager.getLogger(CurrentResourceValue.class);
+  protected static final org.apache.logging.log4j.Logger Designator.logger = org.apache.logging.log4j.LogManager.getLogger(Designator.class);
+  protected static final org.apache.logging.log4j.Logger DivExpression.logger = org.apache.logging.log4j.LogManager.getLogger(DivExpression.class);
+  protected static final org.apache.logging.log4j.Logger Expression.logger = org.apache.logging.log4j.LogManager.getLogger(Expression.class);
+  protected static final org.apache.logging.log4j.Logger HardwareModel.logger = org.apache.logging.log4j.LogManager.getLogger(HardwareModel.class);
+  protected static final org.apache.logging.log4j.Logger ILP.logger = org.apache.logging.log4j.LogManager.getLogger(ILP.class);
+  protected static final org.apache.logging.log4j.Logger IlpAllResourcesVariable.logger = org.apache.logging.log4j.LogManager.getLogger(IlpAllResourcesVariable.class);
+  protected static final org.apache.logging.log4j.Logger IlpBound.logger = org.apache.logging.log4j.LogManager.getLogger(IlpBound.class);
+  protected static final org.apache.logging.log4j.Logger IlpConstraint.logger = org.apache.logging.log4j.LogManager.getLogger(IlpConstraint.class);
+  protected static final org.apache.logging.log4j.Logger IlpLeftHandSide.logger = org.apache.logging.log4j.LogManager.getLogger(IlpLeftHandSide.class);
+  protected static final org.apache.logging.log4j.Logger IlpMappingVariable.logger = org.apache.logging.log4j.LogManager.getLogger(IlpMappingVariable.class);
+  protected static final org.apache.logging.log4j.Logger IlpObjective.logger = org.apache.logging.log4j.LogManager.getLogger(IlpObjective.class);
+  protected static final org.apache.logging.log4j.Logger IlpString.logger = org.apache.logging.log4j.LogManager.getLogger(IlpString.class);
+  protected static final org.apache.logging.log4j.Logger IlpTerm.logger = org.apache.logging.log4j.LogManager.getLogger(IlpTerm.class);
+  protected static final org.apache.logging.log4j.Logger IlpVariable.logger = org.apache.logging.log4j.LogManager.getLogger(IlpVariable.class);
+  protected static final org.apache.logging.log4j.Logger IlpVarInfo.logger = org.apache.logging.log4j.LogManager.getLogger(IlpVarInfo.class);
+  protected static final org.apache.logging.log4j.Logger Implementation.logger = org.apache.logging.log4j.LogManager.getLogger(Implementation.class);
+  protected static final org.apache.logging.log4j.Logger Instance.logger = org.apache.logging.log4j.LogManager.getLogger(Instance.class);
+  protected static final org.apache.logging.log4j.Logger LiteralExpression.logger = org.apache.logging.log4j.LogManager.getLogger(LiteralExpression.class);
+  protected static final org.apache.logging.log4j.Logger MetaParameter.logger = org.apache.logging.log4j.LogManager.getLogger(MetaParameter.class);
+  protected static final org.apache.logging.log4j.Logger MetaParameterAssignment.logger = org.apache.logging.log4j.LogManager.getLogger(MetaParameterAssignment.class);
+  protected static final org.apache.logging.log4j.Logger MetaParameterDesignator.logger = org.apache.logging.log4j.LogManager.getLogger(MetaParameterDesignator.class);
+  protected static final org.apache.logging.log4j.Logger ModelElement.logger = org.apache.logging.log4j.LogManager.getLogger(ModelElement.class);
+  protected static final org.apache.logging.log4j.Logger MultExpression.logger = org.apache.logging.log4j.LogManager.getLogger(MultExpression.class);
+  protected static final org.apache.logging.log4j.Logger Name.logger = org.apache.logging.log4j.LogManager.getLogger(Name.class);
+  protected static final org.apache.logging.log4j.Logger Objective.logger = org.apache.logging.log4j.LogManager.getLogger(Objective.class);
+  protected static final org.apache.logging.log4j.Logger ParenthesizedExpression.logger = org.apache.logging.log4j.LogManager.getLogger(ParenthesizedExpression.class);
+  protected static final org.apache.logging.log4j.Logger PowerExpression.logger = org.apache.logging.log4j.LogManager.getLogger(PowerExpression.class);
+  protected static final org.apache.logging.log4j.Logger Property.logger = org.apache.logging.log4j.LogManager.getLogger(Property.class);
+  protected static final org.apache.logging.log4j.Logger PropertyAggregation.logger = org.apache.logging.log4j.LogManager.getLogger(PropertyAggregation.class);
+  protected static final org.apache.logging.log4j.Logger PropertyResourceDesignator.logger = org.apache.logging.log4j.LogManager.getLogger(PropertyResourceDesignator.class);
+  protected static final org.apache.logging.log4j.Logger QualifiedName.logger = org.apache.logging.log4j.LogManager.getLogger(QualifiedName.class);
+  protected static final org.apache.logging.log4j.Logger QualifiedNameDesignator.logger = org.apache.logging.log4j.LogManager.getLogger(QualifiedNameDesignator.class);
+  protected static final org.apache.logging.log4j.Logger Request.logger = org.apache.logging.log4j.LogManager.getLogger(Request.class);
+  protected static final org.apache.logging.log4j.Logger Resource.logger = org.apache.logging.log4j.LogManager.getLogger(Resource.class);
+  protected static final org.apache.logging.log4j.Logger ResourceMapping.logger = org.apache.logging.log4j.LogManager.getLogger(ResourceMapping.class);
+  protected static final org.apache.logging.log4j.Logger ResourceRequirement.logger = org.apache.logging.log4j.LogManager.getLogger(ResourceRequirement.class);
+  protected static final org.apache.logging.log4j.Logger ResourceType.logger = org.apache.logging.log4j.LogManager.getLogger(ResourceType.class);
+  protected static final org.apache.logging.log4j.Logger Root.logger = org.apache.logging.log4j.LogManager.getLogger(Root.class);
+  protected static final org.apache.logging.log4j.Logger SoftwareDesignator.logger = org.apache.logging.log4j.LogManager.getLogger(SoftwareDesignator.class);
+  protected static final org.apache.logging.log4j.Logger SoftwareModel.logger = org.apache.logging.log4j.LogManager.getLogger(SoftwareModel.class);
+  protected static final org.apache.logging.log4j.Logger Solution.logger = org.apache.logging.log4j.LogManager.getLogger(Solution.class);
+  protected static final org.apache.logging.log4j.Logger SubExpression.logger = org.apache.logging.log4j.LogManager.getLogger(SubExpression.class);
+
+}

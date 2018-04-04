@@ -1,0 +1,49 @@
+aspect ModelStatistics {
+
+  syn int Root.numComponents() {
+    return getSoftwareModel().getNumComponent();
+  }
+
+  syn int Root.numImplementations() {
+    int result = 0;
+    for (Component component : getSoftwareModel().getComponentList()) {
+      result += component.getNumImplementation();
+    }
+    return result;
+  }
+
+  syn int Root.numResources() {
+    int result = 0;
+    for (Resource resource : getHardwareModel().getResourceList()) {
+      result += resource.numResources();
+    }
+    return result;
+  }
+
+  syn int Resource.numResources() {
+    return 1 + getNumSubResource();
+  }
+
+  syn int Root.numContainers() {
+    int result = 0;
+    for (Resource resource : getHardwareModel().getResourceList()) {
+      result += resource.numContainers();
+    }
+    return result;
+  }
+
+  syn int Resource.numContainers() {
+    int total = (getType().getRef().getContainer() ? 1 : 0);
+    for (Resource sub : getSubResourceList()) {
+      total += sub.numContainers();
+    }
+    return total;
+  }
+
+  syn String Root.description() = " ["
+    + numComponents() + " component(s), "
+    + numImplementations() + " implementation(s), "
+    + getNumRequest() + " request(s), "
+    + numContainers() + " container(s)]";
+
+}

@@ -1,0 +1,50 @@
+aspect Helpers {
+
+  /**
+   * @return a deep copy of the assignment
+   */
+  public Assignment Assignment.deepCopy() {
+    Assignment copy = new Assignment();
+    copy.setImplementation(this.getImplementation());
+    copy.setRequest(this.getRequest());
+    copy.setTopLevel(this.getTopLevel());
+
+    for (ComponentMapping subAssignment : getComponentMappingList()) {
+      Assignment subAssignmentClone = subAssignment.getAssignment().deepCopy();
+      copy.addComponentMapping(new ComponentMapping(subAssignment.getInstance(), subAssignmentClone));
+    }
+
+    copy.setResourceMapping(getResourceMapping().deepCopy());
+
+    return copy;
+  }
+
+  /**
+   * @return a deep copy of the resource mapping
+   */
+  public ResourceMapping ResourceMapping.deepCopy() {
+    ResourceMapping copy = new ResourceMapping();
+    copy.setInstance(this.getInstance());
+    copy.setResource(this.getResource());
+    for (ResourceMapping subMapping : getResourceMappingList()) {
+      copy.addResourceMapping(subMapping.deepCopy());
+    }
+    return copy;
+  }
+
+  /**
+   * @return a deep copy of the solution
+   */
+  public Solution Solution.deepCopy() {
+
+    Solution copy = new Solution(getModel(), new List<>());
+
+    for (Assignment assignment : this.getAssignments()) {
+      Assignment clone = assignment.deepCopy();
+      copy.addAssignment(clone);
+    }
+
+    return copy;
+  }
+
+}

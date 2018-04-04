@@ -1,0 +1,44 @@
+aspect Names {
+
+  /**
+   * @return the string identifier of the model element
+   */
+  syn String ModelElement.name() = getName().getName();
+
+  /**
+   * @return the string identifier of the referenced element
+   */
+  syn String InstanceRef.name() = getRef().name();
+
+  /**
+   * @return the string identifier of the referenced element
+   */
+  syn String ResourceTypeRef.name() = getRef().name();
+
+  /**
+   * @return the string identifier of the referenced element
+   */
+  syn String ComponentRef.name() = getRef().name();
+
+  /**
+   * @return the string identifier of the referenced element
+   */
+  syn String PropertyRef.name() = getRef().name();
+
+  /**
+   * @return the string identifier of the referenced element
+   */
+  syn String MetaParameterRef.name() = getRef().name();
+
+  /**
+   * @return the string identifier of the referenced element
+   */
+  syn String Request.name() = getName().getName();
+
+  syn String Designator.simpleName();
+  eq QualifiedNameDesignator.simpleName() = getQualifiedName().getName(getQualifiedName().getNumName()-1).getName();
+  eq SoftwareDesignator.simpleName() = getPropertyRef().name();
+  eq PropertyResourceDesignator.simpleName() = getPropertyRef().name();
+  eq MetaParameterDesignator.simpleName() = getMetaParameterRef().name();
+
+}

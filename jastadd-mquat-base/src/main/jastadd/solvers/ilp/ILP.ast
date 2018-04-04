@@ -1,0 +1,18 @@
+ILP ::= IlpObjective IlpConstraint* IlpBound* IlpVariable* <Info:IlpVarInfo> ;
+TimedOutILP:ILP ::= <Reason:String> ;
+
+// objective kind is either minimize or maximize
+IlpObjective ::= <Kind:IlpObjectiveKind> IlpLeftHandSide ;
+
+IlpConstraint ::= <Name:String> IlpLeftHandSide <ClauseComparator:ClauseComparator> <RightHandSide:double> ;
+
+IlpBound ::= <Ref:IlpVariable> <Type:IlpBoundType> ;
+
+IlpVariable ::= <Name:String> <Request:Request> <Impl:Implementation> ;
+IlpAllResourcesVariable:IlpVariable ;
+IlpMappingVariable:IlpVariable ::= <Resource:Resource> ;
+
+// sum of terms
+IlpLeftHandSide ::= IlpTerm* ;
+
+IlpTerm ::= <Value:double> <Ref:IlpVariable> ;

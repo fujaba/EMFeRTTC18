@@ -1,0 +1,17 @@
+// Expression Language
+
+abstract Expression ;
+
+LiteralExpression:Expression ::= <Value:double> ;
+
+// variation point of the expression language:
+abstract Designator:Expression ;
+
+ParenthesizedExpression:Expression ::= Expression ;
+
+abstract BinaryExpression:Expression ::= Left:Expression Right:Expression ;
+AddExpression:BinaryExpression ;
+SubExpression:BinaryExpression ;
+MultExpression:BinaryExpression ;
+DivExpression:BinaryExpression ;
+PowerExpression:BinaryExpression ;

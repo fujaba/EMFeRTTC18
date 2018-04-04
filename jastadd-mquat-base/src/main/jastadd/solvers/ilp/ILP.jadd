@@ -1,0 +1,97 @@
+aspect ILP {
+
+  public static String Root.ILP_TIMEOUT_VALUE = "de.tudresden.inf.st.mquat.solving.ilp.timeoutValue";
+  public static String Root.ILP_TIMEOUT_UNIT = "de.tudresden.inf.st.mquat.solving.ilp.timeoutUnit";
+
+  public enum IlpObjectiveKind {
+    MINIMIZE,
+    MAXIMIZE
+  }
+
+  public enum IlpBoundType {
+    BINARY,
+    ZERO,
+    GREATER_EQUAL_ZERO
+  }
+
+  public class IlpString {
+    StringBuilder buffer;
+
+    public IlpString() {
+      this.buffer = new StringBuilder();
+    }
+
+    public IlpString lb() {
+      this.buffer.append('\n');
+      return this;
+    }
+
+    public IlpString append(Object o) {
+      buffer.append(o);
+      return this;
+    }
+
+    public IlpString append(final IlpString s) {
+      this.buffer.append(s.getBuffer());
+      return this;
+    }
+
+    public StringBuilder getBuffer() {
+      return buffer;
+    }
+
+    public String toString() {
+      return buffer.toString();
+    }
+  }
+
+  public class IlpVarInfo {
+    public java.util.Map<String, IlpVariable> vars;
+    public java.util.Map<Resource, IlpConstraint> resourceConstraints;
+    public java.util.Set<IlpVariable> illegal;
+
+    public IlpVarInfo() {
+      vars = new java.util.TreeMap<>();
+      resourceConstraints = new java.util.HashMap<>();
+      illegal = new java.util.HashSet<>();
+    }
+
+    public IlpVariable getIlpVariable(Request request, Implementation impl, Resource resource) {
+      String varName = request.getIlpName() + "#" + impl.getIlpName() + "#" + resource.getIlpName();
+      IlpVariable result = vars.get(varName);
+      IlpConstraint resourceConstraint = resourceConstraints.get(resource);
+      if (resourceConstraint == null) {
+        resourceConstraint = new IlpConstraint("one_on_" + resource.getIlpName(), new IlpLeftHandSide(),
+            ClauseComparator.LE, 1);
+        resourceConstraints.put(resource, resourceConstraint);
+      }
+      if (result == null) {
+        result = new IlpMappingVariable(varName, request, impl, resource);
+        vars.put(varName, result);
+        resourceConstraint.getIlpLeftHandSide().addIlpTerm(new IlpTerm(1, result));
+      }
+      return result;
+    }
+
+    public void setIllegal(Request request, Implementation impl, Resource resource) {
+      illegal.add(getIlpVariable(request, impl, resource));
+    }
+
+    public IlpVariable getIlpVariable(Request request, Implementation impl) {
+      String varName = request.getIlpName() + "#" + impl.getIlpName();
+      IlpVariable result = vars.get(varName);
+      if (result == null) {
+        result = new IlpAllResourcesVariable(varName, request, impl);
+        vars.put(varName, result);
+      }
+      return result;
+    }
+  }
+
+  private static double Root.makeNegative(double value) {
+    return value == 0.0 || value == -0.0 ? 0.0 : -1.0 * value;
+  }
+
+  static java.util.regex.Pattern ASTNode.ilpSearchRegex = java.util.regex.Pattern.compile("[.\\-+*/]");
+
+}

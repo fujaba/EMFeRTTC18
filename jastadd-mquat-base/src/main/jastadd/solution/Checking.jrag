@@ -1,0 +1,139 @@
+aspect Checking {
+
+  syn boolean Solution.isValid() {
+    Set<Request> requestSet = new HashSet<>();
+    Set<Resource> resourceSet = new HashSet<>();
+
+    // check assignments
+    Iterator<Assignment> assignmentIterator = this.assignmentIterator();
+    while (assignmentIterator.hasNext()) {
+      Assignment assignment = assignmentIterator.next();
+      if (!assignment.isValid()) {
+        return false;
+      } else {
+        if (assignment.getImplementation().containingComponent() ==
+            assignment.getRequest().getTarget().getRef()) {
+          requestSet.add(assignment.getRequest());
+        }
+        if (resourceSet.contains(assignment.getResource())) {
+          return false;
+        }
+        resourceSet.add(assignment.getResource());
+      }
+    }
+
+    // check if all requests have (at least) one assignment
+    return requestSet.size() == getModel().getRequests().getNumChild();
+  }
+
+
+
+  syn boolean Assignment.isValid() {
+    if (getRequest() == null || getResource() == null || getImplementation() == null) { return false; }
+    for (Clause clause : getImplementation().requirementClauses()) {
+      if (!clause.checkUsing(this)) {
+        return false;
+      }
+    }
+    // if this is a "top-level" assignment, check the properties from the request
+    if (this.getRequest().getTarget().getRef().equals(getImplementation().containingComponent())) {
+      for (Clause clause : getRequest().getConstraintList()) {
+        if (clause.isRequiringClause() && !clause.checkUsing(this)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  syn boolean Solution.isSoftwareValid() {
+
+    // check assignments
+    Iterator<Assignment> assignmentIterator = this.assignmentIterator();
+    while (assignmentIterator.hasNext()) {
+      if (!assignmentIterator.next().isSoftwareValid()) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  syn boolean Assignment.isSoftwareValid() {
+    if (getRequest() == null) {
+      logger.warn("incomplete assignment: request missing");
+      return false;
+    } else if (getImplementation() == null) {
+      logger.warn("incomplete assignment: implementation missing");
+      return false;
+    }
+
+    for (Clause clause : getImplementation().requirementClauses()) {
+      if (clause.getDesignator().isSoftwareDesignator()) {
+        if (!clause.checkUsing(this)) {
+          return false;
+        }
+      }
+
+    }
+
+    // if this is a "top-level" assignment, check the properties from the request
+    if (this.getRequest().getTarget().getRef().equals(getImplementation().containingComponent())) {
+      for (Clause clause : getRequest().getConstraintList()) {
+        if (clause.isRequiringClause() && clause.getDesignator().isSoftwareDesignator()) {
+          if (!clause.checkUsing(this)) {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
+  }
+
+  syn double Solution.computeObjective() {
+    Objective objective = getModel().getObjective();
+
+    Iterator<Assignment> solutionIterator;
+    switch (objective.getAgg()) {
+      case MAX:
+        double max = Double.NEGATIVE_INFINITY;
+        solutionIterator = this.assignmentIterator();
+        while (solutionIterator.hasNext()) {
+          max = Math.max(max, solutionIterator.next().computeObjective());
+        }
+        return max;
+      case SUM:
+        double sum = 0;
+        solutionIterator = this.assignmentIterator();
+        while (solutionIterator.hasNext()) {
+          sum += solutionIterator.next().computeObjective();
+        }
+        return sum;
+    }
+    throw new RuntimeException("java is stupid.");
+  }
+
+  syn double Assignment.computeObjective() {
+    Objective objective = getRequest().root().getObjective();
+    Property property = objective.getPropertyRef().getRef();
+
+    // compute objective property for the implementation
+    for (Clause clause : getImplementation().getClauseList()) {
+      if (clause.isProvidingClause()) {
+        if (clause.getDesignator().isSoftwareDesignator()) {
+          SoftwareDesignator softwareDesignator = clause.getDesignator().asSoftwareDesignator();
+          if (!softwareDesignator.hasInstanceRef()) {
+            // the s.d. has no instance ref, so this is about this very implementation!
+            if (softwareDesignator.getPropertyRef().getRef().equals(property)) {
+              return clause.getExpression().evalUsing(this);
+            }
+          }
+        }
+      }
+    }
+    // TODO what if there is no rule to
+    throw new RuntimeException("Objective could not be computed!");
+  }
+
+}

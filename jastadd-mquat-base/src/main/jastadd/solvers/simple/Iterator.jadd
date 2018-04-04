@@ -1,0 +1,143 @@
+/**
+ *
+ */
+aspect Iterator {
+
+  /**
+   * Changes the solution to the next one (which may well be invalid)
+   *
+   * @return true, iff a new assignment could be found
+   */
+  public boolean Solution.nextSoftwareAssignment() {
+    return nextSoftwareAssignment(0);
+  }
+
+  private boolean Solution.nextSoftwareAssignment(int start) {
+
+    // try to get a next from the rest
+    if (start == this.getNumAssignment()) {
+      // if there is no rest, return false
+      return false;
+    } else if (nextSoftwareAssignment(start + 1)) {
+      // if this succeeds, return true
+      return true;
+    } else {
+
+      boolean nextResult = nextSoftwareAssignment(this.getAssignment(start));
+
+      if (!nextResult) {
+        // reset the rest
+        for (int i = start; i < this.getNumAssignment(); i++) {
+          Assignment oldAssignment = this.getAssignment(i);
+          Assignment newAssignment = createSoftwareAssignment(oldAssignment.getRequest(), oldAssignment.getRequest().getTarget().getRef(), oldAssignment.getTopLevel());
+          this.setAssignment(newAssignment, i);
+        }
+      } else {
+        for (int i = start + 1; i < this.getNumAssignment(); i++) {
+          Assignment oldAssignment = this.getAssignment(i);
+          Assignment newAssignment = createSoftwareAssignment(oldAssignment.getRequest(), oldAssignment.getRequest().getTarget().getRef(), oldAssignment.getTopLevel());
+          this.setAssignment(newAssignment, i);
+        }
+        // no need to flush, because only new assignments were added
+      }
+      return nextResult;
+    }
+  }
+
+  public boolean Solution.nextSoftwareAssignment(Assignment assignment) {
+
+    java.util.List<Instance> componentInstanceList = new ArrayList<>();
+    for (ComponentMapping mapping : assignment.getComponentMappingList()) {
+      componentInstanceList.add(mapping.getInstance());
+    }
+
+    boolean nextResult = nextSoftwareAssignment(assignment, componentInstanceList, 0);
+
+    if (!nextResult) {
+      for (int i = 0; i < assignment.getNumComponentMapping(); i++) {
+        Component requiredComponent = componentInstanceList.get(i).referringComponent();
+        Assignment newAssignment = this.createSoftwareAssignment(assignment.getRequest(), requiredComponent, false);
+        assignment.updateComponentMapping(componentInstanceList.get(i), newAssignment);
+      }
+      // no need to flush, this is done in the method call
+      return nextLocalSoftwareAssignment(assignment);
+    } else {
+      // // FLUSH
+      // assignment.flushTreeCache();
+      // assignment.flushAssignmentUpwards();
+      return true;
+    }
+  }
+
+  public boolean Solution.nextSoftwareAssignment(Assignment assignment, java.util.List<Instance> requiredInstances, int start) {
+
+    // try to get a next from the rest
+    if (start == assignment.getNumComponentMapping()) {
+      return false;
+    } else if (start < assignment.getNumComponentMapping() && nextSoftwareAssignment(assignment, requiredInstances, start + 1)) {
+      return true;
+    } else {
+      boolean nextResult = nextSoftwareAssignment(assignment.mappedAssignment(requiredInstances.get(start)));
+
+      if (!nextResult) {
+        // reset the rest
+        for (int i = start; i < assignment.getNumComponentMapping(); i++) {
+          Component requiredComponent = requiredInstances.get(i).referringComponent();
+          Assignment newAssignment = this.createSoftwareAssignment(assignment.getRequest(), requiredComponent, false);
+          assignment.updateComponentMapping(requiredInstances.get(i), newAssignment);
+        }
+      } else {
+        for (int i = start + 1; i < assignment.getNumComponentMapping(); i++) {
+          Component requiredComponent = requiredInstances.get(i).referringComponent();
+          Assignment newAssignment = this.createSoftwareAssignment(assignment.getRequest(), requiredComponent, false);
+          assignment.updateComponentMapping(requiredInstances.get(i), newAssignment);
+        }
+      }
+      // // FLUSH
+      // assignment.flushCache();
+      return nextResult;
+    }
+  }
+
+
+  private boolean Solution.nextLocalSoftwareAssignment(Assignment assignment) {
+
+    // then, look at a successor implementation
+    int pip = assignment.getImplementation().posInParent();
+    if (pip < assignment.getImplementation().containingComponent().getNumImplementation() - 1) {
+      // pick the first implementation
+      Implementation newImplementation = assignment.getImplementation().containingComponent().getImplementation(pip + 1);
+      assignment.setImplementation(newImplementation);
+
+      // the resourceRequirementAssignments change (even though just the keys are set.)
+      assignment.setResourceMapping(new ResourceMapping(newImplementation.getResourceRequirement().getInstance(0), null, new List<>()));
+
+      // the componentRequirementAssignments change!
+      assignment.setComponentMappingList(new List<>());
+      for (ComponentRequirement componentRequirement : newImplementation.getComponentRequirementList()) {
+        Component requiredComponent = componentRequirement.getComponentRef().getRef();
+        for (Instance instance : componentRequirement.getInstanceList()) {
+          assignment.addComponentMapping(new ComponentMapping(instance, createSoftwareAssignment(assignment.getRequest(), requiredComponent, false)));
+        }
+      }
+
+      // // FLUSH
+      // assignment.flushTreeCache();
+      // assignment.flushAssignmentUpwards();
+      return true;
+    }
+
+    return false;
+  }
+
+  public void Assignment.updateComponentMapping(Instance instance, Assignment assignment) {
+    for (ComponentMapping mapping : getComponentMappingList()) {
+      if (mapping.getInstance() == instance) {
+        mapping.setAssignment(assignment);
+        return;
+      }
+    }
+    addComponentMapping(new ComponentMapping(instance, assignment));
+  }
+
+}

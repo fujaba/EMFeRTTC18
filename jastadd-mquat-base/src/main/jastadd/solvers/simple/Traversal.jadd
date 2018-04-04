@@ -1,0 +1,72 @@
+aspect Traversal {
+
+  /**
+   * @return an iterator over all assignments in the solution
+   */
+  public Iterator<Assignment> Solution.assignmentIterator() {
+    return new Iterator<Assignment>() {
+
+      private Stack<Iterator<Assignment>> iteratorStack = new Stack<>();
+      {
+        iteratorStack.push(getAssignments().iterator());
+      }
+
+      @Override
+      public boolean hasNext() {
+        return !iteratorStack.isEmpty() && iteratorStack.peek().hasNext();
+      }
+
+      @Override
+      public Assignment next() {
+
+        // find current iterator
+        Iterator<Assignment> currentIterator = iteratorStack.peek();
+
+        if (currentIterator != null && currentIterator.hasNext()) {
+          Assignment currentAssignment = currentIterator.next();
+          Iterator<Assignment> nextIterator = currentAssignment.componentMappingIterator();
+          iteratorStack.push(nextIterator);
+
+          currentIterator = nextIterator;
+          while (currentIterator != null && !currentIterator.hasNext()) {
+            iteratorStack.pop();
+            currentIterator = iteratorStack.isEmpty() ? null : iteratorStack.peek();
+          }
+
+          return currentAssignment;
+        }
+
+        throw new NoSuchElementException();
+      }
+
+    };
+  }
+
+  /**
+   * @return an iterator over all component mappings of an assignment
+   */
+  public Iterator<Assignment> Assignment.componentMappingIterator() {
+    return new Iterator<Assignment>() {
+
+      private int index = 0;
+
+      @Override
+      public boolean hasNext() {
+        return index < getNumComponentMapping();
+      }
+
+      @Override
+      public Assignment next() {
+        if (hasNext()) {
+          Assignment result = getComponentMapping(index).getAssignment();
+          index++;
+          return result;
+        } else {
+          throw new NoSuchElementException();
+        }
+      }
+
+    };
+  }
+
+}

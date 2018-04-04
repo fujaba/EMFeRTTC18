@@ -1,0 +1,77 @@
+Root ::= HardwareModel SoftwareModel Request* Objective /ILP/ ;
+
+// =====================================================================================================================
+// Low-Level Grammar Rules
+// =====================================================================================================================
+
+Name                  ::= <Name:String> ;
+QualifiedName         ::= Name* ;
+abstract ModelElement ::= Name ;
+
+// =====================================================================================================================
+// Top-Level Grammar Rules
+// =====================================================================================================================
+
+Instance:ModelElement ;
+InstanceRef ::= Name <Ref:Instance> ;
+
+// =====================================================================================================================
+// Hardware
+// =====================================================================================================================
+
+HardwareModel ::= ResourceType* Resource* Property* ;
+
+ResourceType:ModelElement ::= <Container:Boolean> SubType:ResourceType* Property* PropertyRef* ;
+ResourceTypeRef ::= Name <Ref:ResourceType> ;
+ResourceRequirement ::= ResourceTypeRef Instance* ResourceRequirement* ;
+
+Resource:ModelElement ::= Type:ResourceTypeRef SubResource:Resource* CurrentResourceValue* ;
+
+CurrentResourceValue ::= PropertyRef Value:LiteralExpression ;
+
+// =====================================================================================================================
+// Software
+// =====================================================================================================================
+
+SoftwareModel ::= MetaParameter* Component* Property* ;
+
+Component:ModelElement ::= Implementation* Property* PropertyRef* ;
+ComponentRef ::= Name <Ref:Component> ;
+ComponentRequirement ::= ComponentRef Instance* ;
+
+Implementation:ModelElement ::= ComponentRequirement* ResourceRequirement Clause* ;
+
+// =====================================================================================================================
+// Clauses and Designators
+// =====================================================================================================================
+
+// clauses are not differentiated in the CGF (except for requires/provides)
+// ClauseType { REQUIRING, PROVIDING }
+// ClauseComparator { LT,LE,EQ,NE,GE,GT }
+Clause ::= <ClauseType:ClauseType> Designator <ClauseComparator:ClauseComparator> Expression ;
+
+QualifiedNameDesignator:Designator    ::= QualifiedName ;
+SoftwareDesignator:Designator         ::= [InstanceRef] PropertyRef ;
+PropertyResourceDesignator:Designator ::= InstanceRef PropertyRef ;
+MetaParameterDesignator:Designator    ::= MetaParameterRef ;
+
+// =====================================================================================================================
+// Properties and Meta-Parameters
+// =====================================================================================================================
+
+Property:ModelElement ::= <Unit:String> ;
+PropertyRef ::= Name <Ref:Property> ;
+
+MetaParameter:ModelElement ;
+MetaParameterRef ::= Name <Ref:MetaParameter> ;
+
+MetaParameterAssignment ::= MetaParameterRef LiteralExpression ;
+
+// =====================================================================================================================
+// Requests
+// =====================================================================================================================
+
+Request ::= MetaParameterAssignment* Target:ComponentRef Constraint:Clause* /Name:Name/;
+
+// PropertyAggregation { SUM, MAX }
+Objective ::= PropertyRef <Agg:PropertyAggregation> ;

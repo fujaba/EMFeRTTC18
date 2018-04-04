@@ -1,0 +1,21 @@
+aspect ReferenceHelper {
+  public ComponentRef Component.createRef() {
+    return new ComponentRef(new Name(name()), this);
+  }
+
+  public ResourceTypeRef ResourceType.createRef() {
+    return new ResourceTypeRef(new Name(name()), this);
+  }
+
+  public InstanceRef Instance.createRef() {
+    return new InstanceRef(new Name(name()), this);
+  }
+
+  public PropertyRef Property.createRef() {
+    return new PropertyRef(new Name(name()), this);
+  }
+
+  public MetaParameterRef MetaParameter.createRef() {
+    return new MetaParameterRef(new Name(name()), this);
+  }
+}
