@@ -4,10 +4,16 @@
 
 In order to get the case working, perform the following steps:
 
-- clone the repository: `git clone git@git-st.inf.tu-dresden.de:stgroup/ttc18.git && cd ttc18`
-- build it: `./gradlew build` (or `gradlew.bat build` on Windows)
-- run the benchmark: `./gradlew benchmarkFull`
-	- as this might take long, running a single scenario is possible with `./gradlew benchmarkFull '-Pscenario=1'`
+- Install GLPK to get the reference implementation working (otherwise the test, and therefore build, will fail)
+    - Go to <https://www.gnu.org/software/glpk/> (Linux) or <http://winglpk.sourceforge.net/> (Windows) and follow the instructions
+    - Tested with latest version `4.64` of GLPK
+- Clone the repository: `git clone git@git-st.inf.tu-dresden.de:stgroup/ttc18.git && cd ttc18`
+- Verify, that the path to GLPK is correct in `gradle.properties`
+- Build it: `./gradlew build` (or `gradlew.bat build` on Windows)
+- Run the benchmark: `./gradlew benchmarkFull`
+  	- As this might take long, running a set of scenarios is possible with `./gradlew benchmarkFull -Pscenario=0,small` (comma separated list of ids or names)
+    - Alternatively, the timeout can be set to a smaller value in `jastadd-mquat-benchmark/src/main/resources/scenarios.json`
+    - Please do not alter the definition of the scenarios, instead use the [Custom Benchmark](#custom-benchmark)
 
 ## Overview over the repository structure
 
@@ -30,8 +36,8 @@ The following steps need to be completed:
 1. Add a compile dependency to your project in `build.gradle` of the project `jastadd-mquat-benchmark`
 1. Update [`de.tudresden.inf.st.mquat.benchmark.SolverFactory.createAvailableSolversIfNeeded`](https://git-st.inf.tu-dresden.de/stgroup/ttc18/blob/master/jastadd-mquat-benchmark/src/main/java/de/tudresden/inf/st/mquat/benchmark/SolverFactory.java#L22) to create a new instance of your solver
 1. Add the name of your solver to the benchmark settings
-	- use `jastadd-mquat-benchmark/src/main/resources/scenarios.json` for the Gradle task `benchmarkFull`
-	- use `jastadd-mquat-benchmark/src/main/resources/local-benchmark-settings.json` for the Gralde task `benchmarkCustom` (see [Custom Benchmark](#custom-benchmark) for details)
+	- Use `jastadd-mquat-benchmark/src/main/resources/scenarios.json` for the Gradle task `benchmarkFull`
+	- Use `jastadd-mquat-benchmark/src/main/resources/local-benchmark-settings.json` for the Gralde task `benchmarkCustom` (see [Custom Benchmark](#custom-benchmark) for details)
 1. Run the benchmark, either `./gradlew benchmarkFull` or `./gradlew benchmarkCustom`
 
 ## Custom Benchmark
@@ -66,6 +72,6 @@ Refer to [`de.tudresden.inf.st.mquat.generator.ScenarioDescription`](https://git
 
 ## Notes and Troubleshooting
 
-- please use the gradle wrapper script, as different version of Gradle might not work with the setup
-	- the wrapper script uses version `3.3`
-- if anything is not working as expected, feel free to contact on of the authors of the TTC case or open an [issue](https://git-st.inf.tu-dresden.de/stgroup/ttc18/issues/new)
+- Please use the gradle wrapper script, as different version of Gradle might not work with the setup
+	- The wrapper script uses version `3.3`
+- If anything is not working as expected, feel free to contact on of the authors of the TTC case or open an [issue](https://git-st.inf.tu-dresden.de/stgroup/ttc18/issues/new)
