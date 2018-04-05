@@ -1,194 +1,760 @@
 {
-  "resolveProperty": {
-    "returntype": "Property", 
-    "kind": "syn", 
-    "args": "String name", 
-    "eqs": [
-      "Component"
-    ]
+  "created-at": "2018-04-05T15:41:05.225800", 
+  "found-attributes": {
+    "asMappingVariable": {
+      "": {
+        "eqs": [
+          "IlpVariable", 
+          "IlpMappingVariable"
+        ], 
+        "kind": "syn", 
+        "returntype": "IlpMappingVariable"
+      }
+    }, 
+    "asMetaParameterDesignator": {
+      "": {
+        "eqs": [
+          "Designator", 
+          "MetaParameterDesignator"
+        ], 
+        "kind": "syn", 
+        "returntype": "MetaParameterDesignator"
+      }
+    }, 
+    "asPropertyResourceDesignator": {
+      "": {
+        "eqs": [
+          "Designator", 
+          "PropertyResourceDesignator"
+        ], 
+        "kind": "syn", 
+        "returntype": "PropertyResourceDesignator"
+      }
+    }, 
+    "asSoftwareDesignator": {
+      "": {
+        "eqs": [
+          "Designator", 
+          "SoftwareDesignator"
+        ], 
+        "kind": "syn", 
+        "returntype": "SoftwareDesignator"
+      }
+    }, 
+    "checkUsing": {
+      "Assignment assignment": {
+        "eqs": [
+          "Clause"
+        ], 
+        "kind": "syn", 
+        "returntype": "boolean"
+      }
+    }, 
+    "computeObjective": {
+      "": {
+        "eqs": [
+          "Assignment"
+        ], 
+        "kind": "syn", 
+        "returntype": "double"
+      }
+    }, 
+    "computeResourceType": {
+      "": {
+        "eqs": [
+          "HardwareModel"
+        ], 
+        "kind": "syn", 
+        "returntype": "ResourceType"
+      }
+    }, 
+    "containingAssignment": {
+      "": {
+        "eqs": [
+          "ComponentMapping", 
+          "Assignment.getComponentMapping(int i)"
+        ], 
+        "kind": "inh", 
+        "returntype": "Assignment"
+      }
+    }, 
+    "containingClause": {
+      "": {
+        "eqs": [
+          "Expression", 
+          "Clause.getDesignator()", 
+          "Clause.getExpression()", 
+          "BinaryExpression.getLeft()", 
+          "BinaryExpression.getRight()", 
+          "CurrentResourceValue.getValue()", 
+          "MetaParameterAssignment.getLiteralExpression()"
+        ], 
+        "kind": "inh", 
+        "returntype": "Clause"
+      }
+    }, 
+    "containingComponent": {
+      "": {
+        "eqs": [
+          "Implementation", 
+          "Component.getImplementation()"
+        ], 
+        "kind": "inh", 
+        "returntype": "Component"
+      }
+    }, 
+    "containingComponentMapping": {
+      "": {
+        "eqs": [
+          "Assignment", 
+          "ComponentMapping.getAssignment()", 
+          "Solution.getAssignment(int i)"
+        ], 
+        "kind": "inh", 
+        "returntype": "ComponentMapping"
+      }
+    }, 
+    "containingImplementation": {
+      "": {
+        "eqs": [
+          "Clause", 
+          "Implementation.getClause()", 
+          "Request.getConstraint()"
+        ], 
+        "kind": "inh", 
+        "returntype": "Implementation"
+      }
+    }, 
+    "containingResourceRequirement": {
+      "": {
+        "eqs": [
+          "Instance", 
+          "ComponentRequirement.getInstance()", 
+          "ResourceRequirement.getInstance()"
+        ], 
+        "kind": "inh", 
+        "returntype": "ResourceRequirement"
+      }
+    }, 
+    "cpuType": {
+      "": {
+        "eqs": [
+          "HardwareModel"
+        ], 
+        "kind": "syn", 
+        "returntype": "ResourceType"
+      }
+    }, 
+    "description": {
+      "": {
+        "eqs": [
+          "Root"
+        ], 
+        "kind": "syn", 
+        "returntype": "String"
+      }
+    }, 
+    "diskType": {
+      "": {
+        "eqs": [
+          "HardwareModel"
+        ], 
+        "kind": "syn", 
+        "returntype": "ResourceType"
+      }
+    }, 
+    "evalAsDouble": {
+      "": {
+        "eqs": [
+          "Designator", 
+          "LiteralExpression", 
+          "ParenthesizedExpression", 
+          "AddExpression", 
+          "SubExpression", 
+          "MultExpression", 
+          "DivExpression", 
+          "PowerExpression", 
+          "QualifiedNameDesignator", 
+          "SoftwareDesignator", 
+          "PropertyResourceDesignator", 
+          "MetaParameterDesignator"
+        ], 
+        "kind": "syn", 
+        "returntype": "double"
+      }
+    }, 
+    "evalUsing": {
+      "Assignment assignment": {
+        "eqs": [
+          "Designator", 
+          "LiteralExpression", 
+          "ParenthesizedExpression", 
+          "AddExpression", 
+          "SubExpression", 
+          "MultExpression", 
+          "DivExpression", 
+          "PowerExpression", 
+          "QualifiedNameDesignator", 
+          "SoftwareDesignator", 
+          "PropertyResourceDesignator", 
+          "MetaParameterDesignator"
+        ], 
+        "kind": "syn", 
+        "returntype": "double"
+      }
+    }, 
+    "findFirstProvidingClause": {
+      "Property property": {
+        "eqs": [
+          "Implementation"
+        ], 
+        "kind": "syn", 
+        "returntype": "Clause"
+      }
+    }, 
+    "findImplementationByName": {
+      "String name": {
+        "eqs": [
+          "Root"
+        ], 
+        "kind": "syn", 
+        "returntype": "Implementation"
+      }
+    }, 
+    "findInstanceByName": {
+      "String name": {
+        "eqs": [
+          "ResourceRequirement"
+        ], 
+        "kind": "syn", 
+        "returntype": "Instance"
+      }
+    }, 
+    "findPropertyByName": {
+      "String name": {
+        "eqs": [
+          "SoftwareModel"
+        ], 
+        "kind": "syn", 
+        "returntype": "Property"
+      }
+    }, 
+    "findRequestByName": {
+      "String name": {
+        "eqs": [
+          "Root"
+        ], 
+        "kind": "syn", 
+        "returntype": "Request"
+      }
+    }, 
+    "findResourceByName": {
+      "String name": {
+        "eqs": [
+          "Resource"
+        ], 
+        "kind": "syn", 
+        "returntype": "Resource"
+      }
+    }, 
+    "findResourceTypeByName": {
+      "String name": {
+        "eqs": [
+          "HardwareModel"
+        ], 
+        "kind": "syn", 
+        "returntype": "ResourceType"
+      }
+    }, 
+    "findSubResourceByTypeName": {
+      "String name": {
+        "eqs": [
+          "Resource"
+        ], 
+        "kind": "syn", 
+        "returntype": "Resource"
+      }
+    }, 
+    "findSubResourceTypeByName": {
+      "String name": {
+        "eqs": [
+          "ResourceType"
+        ], 
+        "kind": "syn", 
+        "returntype": "ResourceType"
+      }
+    }, 
+    "getConstraintValueByName": {
+      "String name": {
+        "eqs": [
+          "Request"
+        ], 
+        "kind": "syn", 
+        "returntype": "double"
+      }
+    }, 
+    "getCurrentValueByProperty": {
+      "Property property": {
+        "eqs": [
+          "Resource"
+        ], 
+        "kind": "syn", 
+        "returntype": "double"
+      }
+    }, 
+    "getCurrentValueByPropertyName": {
+      "String name": {
+        "eqs": [
+          "Resource"
+        ], 
+        "kind": "syn", 
+        "returntype": "double"
+      }
+    }, 
+    "getILP": {
+      "": {
+        "eqs": [
+          "Root"
+        ], 
+        "kind": "syn", 
+        "returntype": "ILP"
+      }
+    }, 
+    "getIlpName": {
+      "": {
+        "eqs": [
+          "Request"
+        ], 
+        "kind": "syn", 
+        "returntype": "String"
+      }
+    }, 
+    "getMetaParameterExpression": {
+      "MetaParameter meta": {
+        "eqs": [
+          "Request"
+        ], 
+        "kind": "syn", 
+        "returntype": "LiteralExpression"
+      }
+    }, 
+    "getName": {
+      "": {
+        "eqs": [
+          "Request", 
+          "Root.getRequest(int i)"
+        ], 
+        "kind": "inh", 
+        "returntype": "Name"
+      }
+    }, 
+    "getRequiringClauseInstance": {
+      "ResourceType type, String propertyName, int index": {
+        "eqs": [
+          "Implementation"
+        ], 
+        "kind": "syn", 
+        "returntype": "Instance"
+      }
+    }, 
+    "getRequiringClauseValue": {
+      "ResourceType type, String propertyName, int index": {
+        "eqs": [
+          "Implementation"
+        ], 
+        "kind": "syn", 
+        "returntype": "double"
+      }
+    }, 
+    "getResource": {
+      "": {
+        "eqs": [
+          "Assignment"
+        ], 
+        "kind": "syn", 
+        "returntype": "Resource"
+      }
+    }, 
+    "hasTimeout": {
+      "": {
+        "eqs": [
+          "ILP", 
+          "TimedOutILP"
+        ], 
+        "kind": "syn", 
+        "returntype": "boolean"
+      }
+    }, 
+    "ilpTimeout": {
+      "String reason": {
+        "eqs": [
+          "Root"
+        ], 
+        "kind": "syn", 
+        "returntype": "TimedOutILP"
+      }
+    }, 
+    "inProvidingClause": {
+      "": {
+        "eqs": [
+          "Designator", 
+          "Root.getSoftwareModel()", 
+          "Clause.getExpression()", 
+          "Clause.getDesignator()"
+        ], 
+        "kind": "inh", 
+        "returntype": "boolean"
+      }
+    }, 
+    "inRequiringClause": {
+      "": {
+        "eqs": [
+          "Designator", 
+          "Root.getSoftwareModel()", 
+          "Clause.getExpression()", 
+          "Clause.getDesignator()"
+        ], 
+        "kind": "inh", 
+        "returntype": "boolean"
+      }
+    }, 
+    "info": {
+      "": {
+        "eqs": [
+          "Root"
+        ], 
+        "kind": "syn", 
+        "returntype": "String"
+      }
+    }, 
+    "isMappingVariable": {
+      "": {
+        "eqs": [
+          "IlpVariable", 
+          "IlpMappingVariable"
+        ], 
+        "kind": "syn", 
+        "returntype": "boolean"
+      }
+    }, 
+    "isMetaParameterDesignator": {
+      "": {
+        "eqs": [
+          "Designator", 
+          "MetaParameterDesignator"
+        ], 
+        "kind": "syn", 
+        "returntype": "boolean"
+      }
+    }, 
+    "isPropertyResourceDesignator": {
+      "": {
+        "eqs": [
+          "Designator", 
+          "PropertyResourceDesignator"
+        ], 
+        "kind": "syn", 
+        "returntype": "boolean"
+      }
+    }, 
+    "isProvidingClause": {
+      "": {
+        "eqs": [
+          "Clause"
+        ], 
+        "kind": "syn", 
+        "returntype": "boolean"
+      }
+    }, 
+    "isRequiringClause": {
+      "": {
+        "eqs": [
+          "Clause"
+        ], 
+        "kind": "syn", 
+        "returntype": "boolean"
+      }
+    }, 
+    "isSoftwareDesignator": {
+      "": {
+        "eqs": [
+          "Designator", 
+          "SoftwareDesignator"
+        ], 
+        "kind": "syn", 
+        "returntype": "boolean"
+      }
+    }, 
+    "isSoftwareValid": {
+      "": {
+        "eqs": [
+          "Assignment"
+        ], 
+        "kind": "syn", 
+        "returntype": "boolean"
+      }
+    }, 
+    "isValid": {
+      "": {
+        "eqs": [
+          "Assignment"
+        ], 
+        "kind": "syn", 
+        "returntype": "boolean"
+      }
+    }, 
+    "mappedAssignment": {
+      "Instance instance": {
+        "eqs": [
+          "Assignment"
+        ], 
+        "kind": "syn", 
+        "returntype": "Assignment"
+      }
+    }, 
+    "mappedResource": {
+      "Instance instance": {
+        "eqs": [
+          "ResourceMapping"
+        ], 
+        "kind": "syn", 
+        "returntype": "Resource"
+      }
+    }, 
+    "name": {
+      "": {
+        "eqs": [
+          "Request"
+        ], 
+        "kind": "syn", 
+        "returntype": "String"
+      }
+    }, 
+    "networkType": {
+      "": {
+        "eqs": [
+          "HardwareModel"
+        ], 
+        "kind": "syn", 
+        "returntype": "ResourceType"
+      }
+    }, 
+    "numComponents": {
+      "": {
+        "eqs": [
+          "Root"
+        ], 
+        "kind": "syn", 
+        "returntype": "int"
+      }
+    }, 
+    "numContainers": {
+      "": {
+        "eqs": [
+          "Resource"
+        ], 
+        "kind": "syn", 
+        "returntype": "int"
+      }
+    }, 
+    "numImplementations": {
+      "": {
+        "eqs": [
+          "Root"
+        ], 
+        "kind": "syn", 
+        "returntype": "int"
+      }
+    }, 
+    "numResources": {
+      "": {
+        "eqs": [
+          "Resource"
+        ], 
+        "kind": "syn", 
+        "returntype": "int"
+      }
+    }, 
+    "print": {
+      "MquatWriteSettings settings, int indentationLevel": {
+        "eqs": [
+          "ASTNode", 
+          "ASTNode", 
+          "List", 
+          "Root", 
+          "Name", 
+          "QualifiedName", 
+          "Instance", 
+          "InstanceRef", 
+          "HardwareModel", 
+          "ResourceType", 
+          "ResourceTypeRef", 
+          "ResourceRequirement", 
+          "Resource", 
+          "CurrentResourceValue", 
+          "SoftwareModel", 
+          "Component", 
+          "ComponentRef", 
+          "ComponentRequirement", 
+          "Implementation", 
+          "Clause", 
+          "QualifiedNameDesignator", 
+          "SoftwareDesignator", 
+          "PropertyResourceDesignator", 
+          "MetaParameterDesignator", 
+          "Property", 
+          "PropertyRef", 
+          "MetaParameter", 
+          "MetaParameterRef", 
+          "MetaParameterAssignment", 
+          "Request", 
+          "Objective", 
+          "LiteralExpression", 
+          "AddExpression", 
+          "SubExpression", 
+          "MultExpression", 
+          "DivExpression", 
+          "PowerExpression", 
+          "ILP"
+        ], 
+        "kind": "syn", 
+        "returntype": "MquatString"
+      }
+    }, 
+    "printIlp": {
+      "": {
+        "eqs": [
+          "IlpLeftHandSide"
+        ], 
+        "kind": "syn", 
+        "returntype": "IlpString"
+      }
+    }, 
+    "ramType": {
+      "": {
+        "eqs": [
+          "HardwareModel"
+        ], 
+        "kind": "syn", 
+        "returntype": "ResourceType"
+      }
+    }, 
+    "referringComponent": {
+      "": {
+        "eqs": [
+          "Instance", 
+          "ComponentRequirement.getInstance(int i)", 
+          "ResourceRequirement.getInstance(int i)"
+        ], 
+        "kind": "inh", 
+        "returntype": "Component"
+      }
+    }, 
+    "referringResourceType": {
+      "": {
+        "eqs": [
+          "Instance", 
+          "ComponentRequirement.getInstance()", 
+          "ResourceRequirement.getInstance()"
+        ], 
+        "kind": "inh", 
+        "returntype": "ResourceType"
+      }
+    }, 
+    "resolveMetaParameter": {
+      "String name": {
+        "eqs": [
+          "Request", 
+          "SoftwareModel.getComponent()", 
+          "Component.getImplementation()", 
+          "Root.getRequest()"
+        ], 
+        "kind": "inh", 
+        "returntype": "MetaParameter"
+      }
+    }, 
+    "resolveProperty": {
+      "String name": {
+        "eqs": [
+          "Component"
+        ], 
+        "kind": "syn", 
+        "returntype": "Property"
+      }
+    }, 
+    "resolvePropertyGeneral": {
+      "String name": {
+        "eqs": [
+          "Component", 
+          "SoftwareModel.getComponent()"
+        ], 
+        "kind": "inh", 
+        "returntype": "Property"
+      }
+    }, 
+    "resolveQualifiedName": {
+      "QualifiedName qn": {
+        "eqs": [
+          "Clause", 
+          "Request.getConstraint()", 
+          "Implementation.getClause()"
+        ], 
+        "kind": "inh", 
+        "returntype": "Designator"
+      }
+    }, 
+    "root": {
+      "": {
+        "eqs": [
+          "ASTNode", 
+          "Root", 
+          "ASTNode"
+        ], 
+        "kind": "syn", 
+        "returntype": "Root"
+      }
+    }, 
+    "simpleAssignment": {
+      "Request request, Resource resource": {
+        "eqs": [
+          "Clause"
+        ], 
+        "kind": "syn", 
+        "returntype": "Assignment"
+      }
+    }, 
+    "simpleName": {
+      "": {
+        "eqs": [
+          "Designator", 
+          "QualifiedNameDesignator", 
+          "SoftwareDesignator", 
+          "PropertyResourceDesignator", 
+          "MetaParameterDesignator"
+        ], 
+        "kind": "syn", 
+        "returntype": "String"
+      }
+    }, 
+    "timeoutReason": {
+      "": {
+        "eqs": [
+          "ILP", 
+          "TimedOutILP"
+        ], 
+        "kind": "syn", 
+        "returntype": "String"
+      }
+    }, 
+    "x": {
+      "": {
+        "eqs": [
+          "Clause"
+        ], 
+        "kind": "syn", 
+        "returntype": "Set"
+      }
+    }
   }, 
-  "isSoftwareDesignator": {
-    "returntype": "boolean", 
-    "kind": "syn", 
-    "args": "", 
-    "eqs": [
-      "Designator"
-    ]
-  }, 
-  "findPropertyByName": {
-    "returntype": "Property", 
-    "kind": "syn", 
-    "args": "String name", 
-    "eqs": [
-      "SoftwareModel"
-    ]
-  }, 
-  "asPropertyResourceDesignator": {
-    "returntype": "PropertyResourceDesignator", 
-    "kind": "syn", 
-    "args": "", 
-    "eqs": [
-      "Designator"
-    ]
-  }, 
-  "isMetaParameterDesignator": {
-    "returntype": "boolean", 
-    "kind": "syn", 
-    "args": "", 
-    "eqs": [
-      "Designator"
-    ]
-  }, 
-  "asSoftwareDesignator": {
-    "returntype": "SoftwareDesignator", 
-    "kind": "syn", 
-    "args": "", 
-    "eqs": [
-      "Designator"
-    ]
-  }, 
-  "isPropertyResourceDesignator": {
-    "returntype": "boolean", 
-    "kind": "syn", 
-    "args": "", 
-    "eqs": [
-      "Designator"
-    ]
-  }, 
-  "findImplementationByName": {
-    "returntype": "Implementation", 
-    "kind": "syn", 
-    "args": "String name", 
-    "eqs": [
-      "Root"
-    ]
-  }, 
-  "getRequiringClauseValue": {
-    "returntype": "double", 
-    "kind": "syn", 
-    "args": "ResourceType type, String propertyName, int index", 
-    "eqs": [
-      "Implementation"
-    ]
-  }, 
-  "findInstanceByName": {
-    "returntype": "Instance", 
-    "kind": "syn", 
-    "args": "String name", 
-    "eqs": [
-      "ResourceRequirement"
-    ]
-  }, 
-  "findResourceTypeByName": {
-    "returntype": "ResourceType", 
-    "kind": "syn", 
-    "args": "String name", 
-    "eqs": [
-      "HardwareModel"
-    ]
-  }, 
-  "findSubResourceByTypeName": {
-    "returntype": "Resource", 
-    "kind": "syn", 
-    "args": "String name", 
-    "eqs": [
-      "Resource"
-    ]
-  }, 
-  "resolveMetaParameter": {
-    "returntype": "MetaParameter", 
-    "kind": "syn", 
-    "args": "String name", 
-    "eqs": [
-      "SoftwareModel"
-    ]
-  }, 
-  "findResourceByName": {
-    "returntype": "Resource", 
-    "kind": "syn", 
-    "args": "String name", 
-    "eqs": [
-      "Resource"
-    ]
-  }, 
-  "getCurrentValueByProperty": {
-    "returntype": "double", 
-    "kind": "syn", 
-    "args": "Property property", 
-    "eqs": [
-      "Resource"
-    ]
-  }, 
-  "findSubResourceTypeByName": {
-    "returntype": "ResourceType", 
-    "kind": "syn", 
-    "args": "String name", 
-    "eqs": [
-      "ResourceType"
-    ]
-  }, 
-  "getRequiringClauseInstance": {
-    "returntype": "Instance", 
-    "kind": "syn", 
-    "args": "ResourceType type, String propertyName, int index", 
-    "eqs": [
-      "Implementation"
-    ]
-  }, 
-  "findFirstProvidingClause": {
-    "returntype": "Clause", 
-    "kind": "syn", 
-    "args": "Property property", 
-    "eqs": [
-      "Implementation"
-    ]
-  }, 
-  "findRequestByName": {
-    "returntype": "Request", 
-    "kind": "syn", 
-    "args": "String name", 
-    "eqs": [
-      "Root"
-    ]
-  }, 
-  "getCurrentValueByPropertyName": {
-    "returntype": "double", 
-    "kind": "syn", 
-    "args": "String name", 
-    "eqs": [
-      "Resource"
-    ]
-  }, 
-  "getConstraintValueByName": {
-    "returntype": "double", 
-    "kind": "syn", 
-    "args": "String name", 
-    "eqs": [
-      "Request"
-    ]
-  }, 
-  "resolveQualifiedName": {
-    "returntype": "Designator", 
-    "kind": "syn", 
-    "args": "QualifiedName qn", 
-    "eqs": [
-      "Implementation"
-    ]
-  }, 
-  "root": {
-    "returntype": "Root", 
-    "kind": "syn", 
-    "args": "", 
-    "eqs": [
-      "ASTNode"
-    ]
-  }, 
-  "asMetaParameterDesignator": {
-    "returntype": "MetaParameterDesignator", 
-    "kind": "syn", 
-    "args": "", 
-    "eqs": [
-      "Designator"
-    ]
-  }
+  "warnings": []
 }
