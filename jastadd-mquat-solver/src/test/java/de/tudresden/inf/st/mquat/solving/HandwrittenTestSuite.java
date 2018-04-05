@@ -52,8 +52,8 @@ public abstract class HandwrittenTestSuite {
     Root model = modelAndSolution.getFirstElement();
     Assignment expectedAssignment = new Assignment();
     expectedAssignment.setRequest(model.getRequest(request));
-    expectedAssignment.setImplementation(model.findImplementationByName(impl));
-    expectedAssignment.setResourceMapping(new ResourceMapping(expectedAssignment.getImplementation().getResourceRequirement().getInstance(0), model.findResourceByName(resource), new List<>()));
+    expectedAssignment.setImplementation(model.resolveImplementation(impl).get());
+    expectedAssignment.setResourceMapping(new ResourceMapping(expectedAssignment.getImplementation().getResourceRequirement().getInstance(0), model.resolveResource(resource).get(), new List<>()));
     // check if assignment matches (partly) one listed in the solution
     Iterator<Assignment> assignmentIterator = modelAndSolution.getSecondElement().assignmentIterator();
     while (assignmentIterator.hasNext()) {
@@ -70,7 +70,7 @@ public abstract class HandwrittenTestSuite {
 
   private void assertComponentRequirement(Assignment requiringAssignment,
                                           String instanceName, Assignment expectedProvidingAssignment) {
-    Instance instance = requiringAssignment.getImplementation().findInstanceByName(instanceName);
+    Instance instance = requiringAssignment.getImplementation().resolveInstance(instanceName).get();
     Assignment actualProvidingAssignment = requiringAssignment.mappedAssignment(instance);
     Assert.assertEquals(String.format("Not matching assignment for %s", instanceName),
         expectedProvidingAssignment, actualProvidingAssignment);

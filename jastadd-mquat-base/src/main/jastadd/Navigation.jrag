@@ -28,123 +28,144 @@ aspect Navigation {
   eq Clause.getExpression().containingClause() = this;
   eq BinaryExpression.getLeft().containingClause() = containingClause();
   eq BinaryExpression.getRight().containingClause() = containingClause();
-  eq CurrentResourceValue.getValue().containingClause() = null;
-  eq MetaParameterAssignment.getLiteralExpression().containingClause() = null;
+  eq CurrentResourceValue.getValue().containingClause() {
+    throw new java.util.NoSuchElementException();
+  }
+  eq MetaParameterAssignment.getLiteralExpression().containingClause() {
+    throw new java.util.NoSuchElementException();
+  }
+
+  //--- containingResourceRequirement ---//
+
+  inh ResourceRequirement Instance.containingResourceRequirement();
+  eq ComponentRequirement.getInstance().containingResourceRequirement() = null;
+  eq ResourceRequirement.getInstance().containingResourceRequirement() = this;
+
+  //--- referringResourceType ---//
+
+  inh ResourceType Instance.referringResourceType();
+  eq ComponentRequirement.getInstance().referringResourceType() = null;
+  eq ResourceRequirement.getInstance().referringResourceType() = getResourceTypeRef().getRef();
+
+  //--- referringComponent ---//
+
+  inh Component Instance.referringComponent();
+  eq ComponentRequirement.getInstance(int i).referringComponent() = getComponentRef().getRef();
+  eq ResourceRequirement.getInstance(int i).referringComponent() = null;
 
 
   // downwards search ==================================================================================================
 
+  // request
 
-  //--- findRequestByName ---//
-
-  syn Request Root.findRequestByName(String name) {
+  syn Optional<Request> Root.resolveRequest(String name) {
     for (Request request : getRequestList()) {
       if (request.name().equals(name)) {
-        return request;
+        return Optional.of(request);
       }
     }
-    throw new java.util.NoSuchElementException(name);
+    return Optional.empty();
   }
 
-  //--- findImplementationByName ---//
+  // property
 
-  syn Implementation Root.findImplementationByName(String name) {
+  syn Optional<Property> ResourceType.resolveProperty(String name) {
+    for (Property property: getPropertyList()) {
+      if (property.name().equals(name)) {
+        return Optional.of(property);
+      }
+    }
+
+    for (PropertyRef ref: getPropertyRefList()) {
+      if (ref.getRef().name().equals(name)) {
+        return Optional.of(ref.getRef());
+      }
+    }
+    return Optional.empty();
+  }
+
+  syn Optional<Property> SoftwareModel.resolveProperty(String name) {
+    for (Property property: getPropertyList()) {
+      if (property.name().equals(name)) {
+        return Optional.of(property);
+      }
+    }
+    return Optional.empty();
+  }
+
+  syn Optional<Property> Component.resolveProperty(String name) {
+    for (Property property : getPropertyList()) {
+      if (property.name().equals(name)) {
+        return Optional.of(property);
+      }
+    }
+    for (PropertyRef ref : getPropertyRefList()) {
+      if (ref.name().equals(name)) {
+        return Optional.of(ref.getRef());
+      }
+    }
+    return resolvePropertyGeneral(name);
+  }
+
+  inh Optional<Property> Component.resolvePropertyGeneral(String name);
+
+  eq SoftwareModel.getComponent().resolvePropertyGeneral(String name) {
+    for (Property property : getPropertyList()) {
+      if (property.name().equals(name)) {
+        return Optional.of(property);
+      }
+    }
+    return Optional.empty();
+  }
+
+  // implementation
+
+  syn Optional<Implementation> Root.resolveImplementation(String name) {
     for (Component component : getSoftwareModel().getComponentList()) {
       for (Implementation impl : component.getImplementationList()) {
         if (impl.name().equals(name)) {
-          return impl;
+          return Optional.of(impl);
         }
       }
     }
-    throw new java.util.NoSuchElementException(name);
+    return Optional.empty();
   }
 
-  //--- findResourceByName ---//
+  // resource
 
-  syn Resource Root.findResourceByName(String name) {
+  syn Optional<Resource> Root.resolveResource(String name) {
     for (Resource resource : getHardwareModel().getResourceList()) {
-      if (resource.findResourceByName(name) != null) {
-        return resource.findResourceByName(name);
+      if (resource.resolveResource(name).isPresent()) {
+        return resource.resolveResource(name);
       }
     }
-    throw new java.util.NoSuchElementException(name);
+    return Optional.empty();
   }
 
-  syn Resource Resource.findResourceByName(String name) {
+  syn Optional<Resource> Resource.resolveResource(String name) {
     if (name().equals(name)) {
-      return this;
+      return Optional.of(this);
     }
     for (Resource sub : getSubResourceList()) {
-      if (sub.findResourceByName(name) != null) {
-        return sub.findResourceByName(name);
+      Optional<Resource> result = sub.resolveResource(name);
+      if (result.isPresent()) {
+        return result;
       }
     }
-    return null;
+    return Optional.empty();
   }
 
-  //--- findInstanceByName ---//
-
-  syn Instance Implementation.findInstanceByName(String name) {
-    for (ComponentRequirement cr : getComponentRequirementList()) {
-      for (Instance instance : cr.getInstanceList()) {
-        if (instance.name().equals(name)) {
-          return instance;
-        }
-      }
-    }
-    for (Instance instance : getResourceRequirement().getInstanceList()) {
-      if (instance.name().equals(name)) {
-        return instance;
-      }
-    }
-    throw new java.util.NoSuchElementException(name);
-  }
-
-  syn Instance ResourceRequirement.findInstanceByName(String name) {
-    // search sub resource requirements
-    for (ResourceRequirement subRequirement : getResourceRequirementList()) {
-      for (Instance instance : subRequirement.getInstanceList()) {
-        if (instance.name().equals(name)) {
-          return instance;
-        }
-      }
-    }
-    throw new java.util.NoSuchElementException(name);
-  }
-
-  //--- findResourceTypeByName ---//
-
-  syn ResourceType HardwareModel.findResourceTypeByName(String name) {
-    for (ResourceType type: getResourceTypeList()) {
-      if (type.name().equals(name)) {
-        return type;
-      }
-    }
-    throw new RuntimeException("Did not find resource type '" + name + "'");
-  }
-
-  //--- findSubResourceByName ---//
-
-  syn ResourceType ResourceType.findSubResourceTypeByName(String name) {
-    for (ResourceType sub: getSubTypeList()) {
-      if (sub.name().equals(name)) {
-        return sub;
-      }
-    }
-    throw new RuntimeException("Did not find sub-resource type '" + name + "'");
-  }
-
-  syn Resource Resource.findSubResourceByTypeName(String name) {
+  syn Optional<Resource> Resource.resolveResourceByTypeName(String name) {
     for (Resource sub: getSubResourceList()) {
       if (sub.getType().getRef().name().equals(name)) {
-        return sub;
+        return Optional.of(sub);
       }
     }
-    throw new RuntimeException("Did not find sub-resource '" + name + "'");
+    return Optional.empty();
   }
 
   syn java.util.List<Resource> Resource.findSubResourcesByTypeName(String name) {
-    java.util.List<Resource> result = new java.util.ArrayList<Resource>();
+    java.util.List<Resource> result = new java.util.ArrayList<>();
     for (Resource sub: getSubResourceList()) {
       if (sub.getType().getRef().name().equals(name)) {
         result.add(sub);
@@ -153,106 +174,81 @@ aspect Navigation {
     return result;
   }
 
+  // instance
 
-
-  //--- getPropertyByName ---//
-
-  syn Property ResourceType.findPropertyByName(String name) {
-    // TODO rename to resolveProperty
-    for (Property property: getPropertyList()) {
-      if (property.name().equals(name)) {
-        return property;
+  syn Optional<Instance> Implementation.resolveInstance(String name) {
+    for (ComponentRequirement cr : getComponentRequirementList()) {
+      for (Instance instance : cr.getInstanceList()) {
+        if (instance.name().equals(name)) {
+          return Optional.of(instance);
+        }
       }
     }
-
-    for (PropertyRef ref: getPropertyRefList()) {
-      if (ref.getRef().name().equals(name)) {
-        return ref.getRef();
+    for (Instance instance : getResourceRequirement().getInstanceList()) {
+      if (instance.name().equals(name)) {
+        return Optional.of(instance);
       }
     }
-    throw new RuntimeException("Did not find property '" + name + "'");
+    return Optional.empty();
   }
 
-  syn Property SoftwareModel.findPropertyByName(String name) {
-    for (Property property: getPropertyList()) {
-      if (property.name().equals(name)) {
-        return property;
+  syn Optional<Instance> ResourceRequirement.resolveInstance(String name) {
+    // search sub resource requirements
+    for (ResourceRequirement subRequirement : getResourceRequirementList()) {
+      for (Instance instance : subRequirement.getInstanceList()) {
+        if (instance.name().equals(name)) {
+          return Optional.of(instance);
+        }
       }
     }
-    throw new RuntimeException("Did not find property '" + name + "'");
+    return Optional.empty();
   }
 
-  //--- requirementClauses ---//
+  // resourceType
 
-  syn java.util.List<Clause> Implementation.requirementClauses() {
-    java.util.List<Clause> result = new java.util.ArrayList<>();
-    for (Clause clause : getClauseList()) {
-      if (clause.isRequiringClause()) {
-        result.add(clause);
+  syn Optional<ResourceType> HardwareModel.resolveResourceType(String name) {
+    for (ResourceType type: getResourceTypeList()) {
+      if (type.name().equals(name)) {
+        return Optional.of(type);
       }
     }
-    return result;
+    return Optional.empty();
   }
 
-  //--- allImplementations ---//
-
-  syn java.util.List<Implementation> Root.allImplementations() {
-    java.util.List<Implementation> result = new java.util.ArrayList<>();
-    for (Component component : this.getSoftwareModel().getComponents()) {
-      for (Implementation implementation : component.getImplementations()) {
-        result.add(implementation);
+  syn Optional<ResourceType> ResourceType.resolveResourceType(String name) {
+    for (ResourceType sub: getSubTypeList()) {
+      if (sub.name().equals(name)) {
+        return Optional.of(sub);
       }
     }
-    return result;
+    return Optional.empty();
   }
 
-  syn Clause Implementation.findFirstProvidingClause(Property property) {
+  // clause
+
+  syn Optional<Clause> Implementation.findFirstProvidingClause(Property property) {
     for (Clause clause : getClauseList()) {
       if (clause.getClauseType() != ClauseType.PROVIDING) continue;
       Designator designator = clause.getDesignator();
       if (designator.isSoftwareDesignator() && designator.asSoftwareDesignator().getPropertyRef().getRef().equals(property)) {
-        return clause;
+        return Optional.of(clause);
       }
     }
-    return null;
+    return Optional.empty();
   }
 
-  /**
-   * Searches in all implementations of the required component for providing clauses.
-   */
-  syn java.util.List<Tuple<Implementation, Clause>> Clause.providingClausesOfRequiredComponent() {
-    java.util.List<Tuple<Implementation, Clause>> result = new java.util.ArrayList<>();
-    if (getDesignator().isSoftwareDesignator()) {
-      SoftwareDesignator swDesignator = getDesignator().asSoftwareDesignator();
-      Property prop = swDesignator.getPropertyRef().getRef();
-      if (swDesignator.hasInstanceRef()) {
-        Component reqComponent = getDesignator().asSoftwareDesignator().getInstanceRef().getRef().referringComponent();
-        for (Implementation reqImpl : reqComponent.getImplementationList()) {
-          // TODO maybe implement findFirstProvidingClause for Implementation
-          Clause providingClause = reqImpl.findFirstProvidingClause(prop);
-          if (providingClause != null) { result.add(new Tuple<>(reqImpl, providingClause)); }
-        }
-      }
-    }
-    return result;
-  }
-
-  // name resolution ===================================================================================================
-
-
-
-  //--- resolveQualifiedName ---//
+  // designator
 
   inh Designator Clause.resolveQualifiedName(QualifiedName qn);
 
   eq Request.getConstraint().resolveQualifiedName(QualifiedName qn) {
-      // this designator refers either to a MetaParameter ...
-      MetaParameter meta = resolveMetaParameter(qn.getName(0).getName());
-      if (meta != null) {
-        return new MetaParameterDesignator(meta.createRef());
-      }
-      // ... or to a property of the target component
-      return new SoftwareDesignator(new Opt<>(), getTarget().getRef().resolveProperty(qn.getName(0).getName()).createRef());
+    // this designator refers either to a MetaParameter ...
+    Optional<MetaParameter> meta = resolveMetaParameter(qn.getName(0).getName());
+    if (meta.isPresent()) {
+      return new MetaParameterDesignator(meta.get().createRef());
+    }
+    // ... or to a property of the target component
+    return new SoftwareDesignator(new Opt<>(), getTarget().getRef().resolveProperty(qn.getName(0).getName()).get().createRef());
   }
 
   eq Implementation.getClause().resolveQualifiedName(QualifiedName qn) = resolveQualifiedName(qn);
@@ -260,14 +256,14 @@ aspect Navigation {
   syn Designator Implementation.resolveQualifiedName(QualifiedName qn) {
     if (qn.getNumName() == 1) {
       // we have a meta parameter or something in the current context
-      MetaParameter meta=resolveMetaParameter(qn.getName(0).getName());
-      if(meta!=null) {
-        return new MetaParameterDesignator(meta.createRef());
+      Optional<MetaParameter> meta = resolveMetaParameter(qn.getName(0).getName());
+      if(meta.isPresent()) {
+        return new MetaParameterDesignator(meta.get().createRef());
       }
       // else, interpret the property as a local one of the current component
       // this might cause an exception of the property can not be resolved
-      Property property=containingComponent().resolveProperty(qn.getName(0).getName());
-      return new SoftwareDesignator(new Opt<>(),property.createRef());
+      Optional<Property> property = containingComponent().resolveProperty(qn.getName(0).getName());
+      return new SoftwareDesignator(new Opt<>(),property.get().createRef());
     } else {
 
       // first, check if it is a component requirement
@@ -281,7 +277,7 @@ aspect Navigation {
             // now resolve property of the type of the instance. we know, the instance refers to a component.
             Component component=instance.referringComponent();
             return new SoftwareDesignator(new Opt<>(instance.createRef()),
-                component.resolveProperty(propertyName).createRef());
+                component.resolveProperty(propertyName).get().createRef());
           }
         }
       }
@@ -302,123 +298,80 @@ aspect Navigation {
                 currentInstance = instance;
               }
             }
-          }
         }
+      }
       // now, currentRequirement refers to the final resource type
-      return new PropertyResourceDesignator(currentInstance.createRef(), currentRequirement.getResourceTypeRef().getRef().findPropertyByName(qn.getName(qn.getNumName()-1).getName()).createRef());
+      return new PropertyResourceDesignator(currentInstance.createRef(), currentRequirement.getResourceTypeRef().getRef().resolveProperty(qn.getName(qn.getNumName()-1).getName()).get().createRef());
     }
   }
 
-  //--- resolveProperty ---//
-
-  syn Property Component.resolveProperty(String name) {
-    for (Property p : getPropertyList()) {
-      if (p.name().equals(name)) {
-        return p;
-      }
-    }
-    for (PropertyRef ref : getPropertyRefList()) {
-      if (ref.name().equals(name)) {
-        return ref.getRef();
-      }
-    }
-    // TODO resolvePropertyGeneral should actually not be needed anymore (all properties must be def'ed in Component)
-    return resolvePropertyGeneral(name);
-  }
-
-  //--- resolvePropertyGeneral ---//
-
-  inh Property Component.resolvePropertyGeneral(String name);
-
-  eq SoftwareModel.getComponent().resolvePropertyGeneral(String name) {
-    for (Property p : getPropertyList()) {
-      if (p.name().equals(name)) {
-        return p;
-      }
-    }
-    throw new RuntimeException("Property not found: " + name);
-  }
+  // metaparameter
 
   //--- resolveMetaParameter ---//
 
-  syn MetaParameter SoftwareModel.resolveMetaParameter(String name) {
+  syn Optional<MetaParameter> SoftwareModel.resolveMetaParameter(String name) {
     for (MetaParameter meta : getMetaParameterList()) {
       if (meta.name().equals(name)) {
-        return meta;
+        return Optional.of(meta);
       }
     }
-    // TODO maybe add a note here for unsuccessful resolving. or throw something?
-    return null;
+    return Optional.empty();
   }
 
-  inh MetaParameter Component.resolveMetaParameter(String name);
+  inh Optional<MetaParameter> Component.resolveMetaParameter(String name);
   eq SoftwareModel.getComponent().resolveMetaParameter(String name) = resolveMetaParameter(name);
 
-  inh MetaParameter Implementation.resolveMetaParameter(String name);
+  inh Optional<MetaParameter> Implementation.resolveMetaParameter(String name);
   eq Component.getImplementation().resolveMetaParameter(String name) = resolveMetaParameter(name);
 
-  inh MetaParameter Request.resolveMetaParameter(String name);
+  inh Optional<MetaParameter> Request.resolveMetaParameter(String name);
   eq Root.getRequest().resolveMetaParameter(String name) = getSoftwareModel().resolveMetaParameter(name);
 
 
-  //--- getRequiringClauseInstance ---//
+  // collections =======================================================================================================
 
-  syn Instance Implementation.getRequiringClauseInstance(ResourceType type, String propertyName) {
-    for (Clause clause: getClauseList()) {
-      Designator designator = clause.getDesignator();
-      if (clause.getClauseType() == ClauseType.REQUIRING
-              && designator.isPropertyResourceDesignator()
-              && designator.asPropertyResourceDesignator().getInstanceRef().getRef().referringResourceType().equals(type)
-              && designator.simpleName().equals(propertyName)) {
-          return designator.asPropertyResourceDesignator().getInstanceRef().getRef();
+  //--- requiy-crementClauses ---//
+
+  syn java.util.List<Clause> Implementation.requirementClauses() {
+    java.util.List<Clause> result = new java.util.ArrayList<>();
+    for (Clause clause : getClauseList()) {
+      if (clause.isRequiringClause()) {
+        result.add(clause);
       }
     }
-    return null;
+    return result;
+    }
+
+
+  syn java.util.List<Implementation> Root.allImplementations() {
+    java.util.List<Implementation> result = new java.util.ArrayList<>();
+    for (Component component : this.getSoftwareModel().getComponents()) {
+      for (Implementation implementation : component.getImplementations()) {
+        result.add(implementation);
+      }
+    }
+    return result;
   }
 
-  syn Instance Implementation.getRequiringClauseInstance(ResourceType type, String propertyName, int index) {
-    int i = 0;
-    for (Clause clause: getClauseList()) {
-      Designator designator = clause.getDesignator();
-      if (clause.getClauseType() == ClauseType.REQUIRING
-          && designator.isPropertyResourceDesignator()
-          && designator.asPropertyResourceDesignator().getInstanceRef().getRef().referringResourceType().equals(type)
-          && designator.simpleName().equals(propertyName)) {
-        if (i==index) {
-          return designator.asPropertyResourceDesignator().getInstanceRef().getRef();
-        } else {
-          i++;
+  /**
+   * Searches in all implementations of the required component for providing clauses.
+   */
+  syn java.util.List<Tuple<Implementation, Clause>> Clause.providingClausesOfRequiredComponent() {
+    java.util.List<Tuple<Implementation, Clause>> result = new java.util.ArrayList<>();
+    if (getDesignator().isSoftwareDesignator()) {
+      SoftwareDesignator swDesignator = getDesignator().asSoftwareDesignator();
+      Property prop = swDesignator.getPropertyRef().getRef();
+      if (swDesignator.hasInstanceRef()) {
+        Component reqComponent = getDesignator().asSoftwareDesignator().getInstanceRef().getRef().referringComponent();
+        for (Implementation reqImpl : reqComponent.getImplementationList()) {
+          // TODO maybe implement findFirstProvidingClause for Implementation
+          Optional<Clause> providingClause = reqImpl.findFirstProvidingClause(prop);
+          if (providingClause.isPresent()) { result.add(new Tuple<>(reqImpl, providingClause.get())); }
         }
       }
     }
-    return null;
+    return result;
   }
-
-
-
-
-  //--- containingResourceRequirement ---//
-
-  inh ResourceRequirement Instance.containingResourceRequirement();
-  eq ComponentRequirement.getInstance().containingResourceRequirement() {
-    throw new RuntimeException("There is no resource requirement for an instance of a component.");
-  }
-  eq ResourceRequirement.getInstance().containingResourceRequirement() = this;
-
-  //--- referringResourceType ---//
-
-  inh ResourceType Instance.referringResourceType();
-  eq ComponentRequirement.getInstance().referringResourceType() {
-    throw new RuntimeException("There is no resource for an instance of a component.");
-  }
-  eq ResourceRequirement.getInstance().referringResourceType() = getResourceTypeRef().getRef();
-
-  //--- referringComponent ---//
-
-  inh Component Instance.referringComponent();
-  eq ComponentRequirement.getInstance(int i).referringComponent() = getComponentRef().getRef();
-  eq ResourceRequirement.getInstance(int i).referringComponent() = null;
-
 
   syn java.util.Collection<Component> Implementation.getRequiredComponents() {
     java.util.List<Component> result = new java.util.ArrayList();
@@ -522,5 +475,26 @@ aspect Navigation {
     throw new RuntimeException("Did not find a requiring clause for designator '" + propertyName + "'");
   }
 
+  syn Instance Implementation.getRequiringClauseInstance(ResourceType type, String propertyName) {
+    return getRequiringClauseInstance(type, propertyName, 0);
+  }
+
+  syn Instance Implementation.getRequiringClauseInstance(ResourceType type, String propertyName, int index) {
+    int i = 0;
+    for (Clause clause: getClauseList()) {
+      Designator designator = clause.getDesignator();
+      if (clause.getClauseType() == ClauseType.REQUIRING
+          && designator.isPropertyResourceDesignator()
+          && designator.asPropertyResourceDesignator().getInstanceRef().getRef().referringResourceType().equals(type)
+          && designator.simpleName().equals(propertyName)) {
+        if (i==index) {
+          return designator.asPropertyResourceDesignator().getInstanceRef().getRef();
+        } else {
+          i++;
+        }
+      }
+    }
+    return null;
+  }
 
 }

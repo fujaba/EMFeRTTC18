@@ -72,9 +72,9 @@ aspect ILP {
             IlpTerm term = new IlpTerm();
             IlpVariable var = info.getIlpVariable(request, impl, resource);
             term.setRef(var);
-            Clause providingObjectiveClause = impl.findFirstProvidingClause(getObjective().getPropertyRef().getRef());
-            if (providingObjectiveClause != null) {
-              term.setValue(providingObjectiveClause.evalUsing(request, resource));
+            Optional<Clause> providingObjectiveClause = impl.findFirstProvidingClause(getObjective().getPropertyRef().getRef());
+            if (providingObjectiveClause.isPresent()) {
+              term.setValue(providingObjectiveClause.get().evalUsing(request, resource));
             } else {
               term.setValue(0);
             }
@@ -150,10 +150,10 @@ aspect ILP {
         Property requiredProperty = requiredClause.getDesignator().asSoftwareDesignator().getPropertyRef().getRef();
         for(Implementation impl : request.getTarget().getRef().getImplementationList()) {
           for (Resource resource : this.getHardwareModel().getResources()) {
-            Clause providingClause = impl.findFirstProvidingClause(requiredProperty);
-            if (providingClause != null) {
+            Optional<Clause> providingClause = impl.findFirstProvidingClause(requiredProperty);
+            if (providingClause.isPresent()) {
               IlpVariable var = info.getIlpVariable(request, impl, resource);
-              reqLhs.addIlpTerm(new IlpTerm(providingClause.evalUsing(request, resource), var));
+              reqLhs.addIlpTerm(new IlpTerm(providingClause.get().evalUsing(request, resource), var));
             }
           }
         }

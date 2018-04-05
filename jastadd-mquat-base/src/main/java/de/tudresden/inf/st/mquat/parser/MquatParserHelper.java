@@ -75,11 +75,11 @@ public class MquatParserHelper {
     Tuple<String, String> tuple = resourceMappingTerminals.get(rm);
     // first name in tuple is instance name
     // resolve instance using implementation of assignment
-    Instance instance = impl.findInstanceByName(tuple.getFirstElement());
+    Instance instance = impl.resolveInstance(tuple.getFirstElement()).get();
     rm.setInstance(instance);
     // second name in tuple is resource name
     // resolve top-level resource using model
-    Resource container = impl.root().findResourceByName(tuple.getSecondElement());
+    Resource container = impl.root().resolveResource(tuple.getSecondElement()).get();
     rm.setResource(container);
     ResourceRequirement rr = instance.containingResourceRequirement();
     for (ResourceMapping subResMapping : rm.getResourceMappingList()) {
@@ -91,10 +91,10 @@ public class MquatParserHelper {
     // resolve sub-resource using the top-level resource, and the corresponding resource requirement
     Tuple<String, String> tuple = resourceMappingTerminals.get(rm);
     // first name in tuple is instance name
-    Instance instance = rr.findInstanceByName(tuple.getFirstElement());
+    Instance instance = rr.resolveInstance(tuple.getFirstElement()).get();
     rm.setInstance(instance);
     // second name in tuple is resource name
-    Resource resource = container.findResourceByName(tuple.getSecondElement());
+    Resource resource = container.resolveResource(tuple.getSecondElement()).get();
     rm.setResource(resource);
     if (rm.getNumResourceMapping() > 0) {
       ResourceRequirement subResReq = instance.containingResourceRequirement();
@@ -116,10 +116,10 @@ public class MquatParserHelper {
     for (Assignment assignment : unfinishedSolution.getAssignmentList()) {
       Tuple<String, String> value = assignmentTerminals.get(assignment);
       // first name in value is request name
-      Request request = model.findRequestByName(value.getFirstElement());
+      Request request = model.resolveRequest(value.getFirstElement()).get();
       assignment.setRequest(request);
       // second name in value is impl name
-      Implementation impl = model.findImplementationByName(value.getSecondElement());
+      Implementation impl = model.resolveImplementation(value.getSecondElement()).get();
       assignment.setImplementation(impl);
       resolveResourceMappingOf(assignment);
     }
@@ -156,9 +156,9 @@ public class MquatParserHelper {
       ComponentMapping cm = assignment.containingComponentMapping();
       // to find correct instance, we need to start at implementation of parentAssignment
       parentAssignment = cm.containingAssignment();
-      cm.setInstance(parentAssignment.getImplementation().findInstanceByName(entry.getValue().getFirstElement()));
+      cm.setInstance(parentAssignment.getImplementation().resolveInstance(entry.getValue().getFirstElement()).get());
       // second name in value is name of impl
-      Implementation impl = model.findImplementationByName(entry.getValue().getSecondElement());
+      Implementation impl = model.resolveImplementation(entry.getValue().getSecondElement()).get();
       assignment.setImplementation(impl);
       resolveResourceMappingOf(assignment);
     }

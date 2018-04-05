@@ -237,12 +237,12 @@ public class ScenarioGenerator {
     ResourceType diskType = hardwareModel.diskType();
     ResourceType networkType = hardwareModel.networkType();
 
-    Property frequency = cpuType.findPropertyByName("frequency");
-    Property load = cpuType.findPropertyByName("load");
-    Property total = ramType.findPropertyByName("total");
-    Property free = ramType.findPropertyByName("free");
-    Property throughput = networkType.findPropertyByName("throughput");
-    Property latency = networkType.findPropertyByName("latency");
+    Property frequency = cpuType.resolveProperty("frequency").get();
+    Property load = cpuType.resolveProperty("load").get();
+    Property total = ramType.resolveProperty("total").get();
+    Property free = ramType.resolveProperty("free").get();
+    Property throughput = networkType.resolveProperty("throughput").get();
+    Property latency = networkType.resolveProperty("latency").get();
 
     // create a new resource
     Resource resource = new Resource(new Name("resource" + String.valueOf(i)), type.createRef(), new List<>(), new List<>());
@@ -288,22 +288,16 @@ public class ScenarioGenerator {
     model.getSoftwareModel().addComponent(component);
 
     // get the ResourceTypes we need
-    ResourceType cpu = model.getHardwareModel().findResourceTypeByName("ComputeNode").findSubResourceTypeByName("CPU");
-    ResourceType ram = model.getHardwareModel().findResourceTypeByName("ComputeNode").findSubResourceTypeByName("RAM");
-    ResourceType disk = model.getHardwareModel().findResourceTypeByName("ComputeNode").findSubResourceTypeByName("DISK");
-    ResourceType network = model.getHardwareModel().findResourceTypeByName("ComputeNode").findSubResourceTypeByName("NETWORK");
+    ResourceType cpu = model.getHardwareModel().resolveResourceType("ComputeNode").get().resolveResourceType("CPU").get();
+    ResourceType ram = model.getHardwareModel().resolveResourceType("ComputeNode").get().resolveResourceType("RAM").get();
+    ResourceType disk = model.getHardwareModel().resolveResourceType("ComputeNode").get().resolveResourceType("DISK").get();
+    ResourceType network = model.getHardwareModel().resolveResourceType("ComputeNode").get().resolveResourceType("NETWORK").get();
 
-    // get the properties we need
-    assert cpu != null;
-    assert ram != null;
-    assert network != null;
-    assert disk != null;
-
-    Property frequency = cpu.findPropertyByName("frequency");
-    Property total = ram.findPropertyByName("total");
-    Property throughput = network.findPropertyByName("throughput");
-    Property quality = model.getSoftwareModel().findPropertyByName("quality");
-    Property energy = model.getSoftwareModel().findPropertyByName("energy");
+    Property frequency = cpu.resolveProperty("frequency").get();
+    Property total = ram.resolveProperty("total").get();
+    Property throughput = network.resolveProperty("throughput").get();
+    Property quality = model.getSoftwareModel().resolveProperty("quality").get();
+    Property energy = model.getSoftwareModel().resolveProperty("energy").get();
 //    Property flops = model.getHardwareModel().getResourceType(0).getPropertyByName("flops");
 
     component.addPropertyRef(quality.createRef());
@@ -557,10 +551,10 @@ public class ScenarioGenerator {
     Root model = solution.getModel();
 
     ResourceType computeType = model.getHardwareModel().getResourceType(0);
-    ResourceType cpuType = model.getHardwareModel().getResourceType(0).findSubResourceTypeByName("CPU");
-    ResourceType ramType = model.getHardwareModel().getResourceType(0).findSubResourceTypeByName("RAM");
-    ResourceType diskType = model.getHardwareModel().getResourceType(0).findSubResourceTypeByName("DISK");
-    ResourceType networkType = model.getHardwareModel().getResourceType(0).findSubResourceTypeByName("NETWORK");
+    ResourceType cpuType = model.getHardwareModel().getResourceType(0).resolveResourceType("CPU").get();
+    ResourceType ramType = model.getHardwareModel().getResourceType(0).resolveResourceType("RAM").get();
+    ResourceType diskType = model.getHardwareModel().getResourceType(0).resolveResourceType("DISK").get();
+    ResourceType networkType = model.getHardwareModel().getResourceType(0).resolveResourceType("NETWORK").get();
 
     Assignment currentAssignment = new Assignment();
     currentAssignment.setTopLevel(isTopLevel);

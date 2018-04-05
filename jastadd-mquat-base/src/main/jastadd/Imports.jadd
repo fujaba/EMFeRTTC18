@@ -8,8 +8,4 @@ import java.util.HashMap;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.NoSuchElementException;
-
-aspect X {
-
-  syn Set Clause.x() = null;
-}
+import java.util.Optional;
