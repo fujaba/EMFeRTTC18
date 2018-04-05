@@ -19,8 +19,6 @@ All modules are prefixed with `jastadd-mquat`, as this is an implementation of M
 - `solver-ilp`: Reference implementation using ILP
 - `solver-simple`: Naïve, brute-force solver written in Java
 
-**TODO: Check links** https://git-st.inf.tu-dresden.de/stgroup/ttc18/blob/master/jastadd-mquat-benchmark/src/main/java/de/tudresden/inf/st/mquat/benchmark/BenchmarkableSolver.java
-
 ## Creating a solution
 
 A new solution should be created using a new module (or multiple, if necessary). You can use the simple-solver module as an example.

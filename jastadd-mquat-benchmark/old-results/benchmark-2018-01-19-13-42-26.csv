@@ -1,6 +1,0 @@
-when,tlc,asc,std,dep,bi,bm,res,nfp,req,cpu,seed,comp,impl,conf,gen,ilp-externalGen,ilp-externalSolved,ilp-externalValid,ilp-externalTimeOut,ilp-directGen,ilp-directSolved,ilp-directValid,ilp-directTimeOut,simpleSolved,simpleValid,simpleTimeOut,mh-naiveGen,mh-naiveSolved,mh-naiveValid,mh-naiveTimeOut,initObj,ilp-externalObj,ilp-directObj,simpleObj,mh-naiveObj
-2018-01-19-13-42-26,1,1,0,1,3,2,1.0,1,0,1,0,1,3,6,32,0,0,true,false,0,0,true,false,0,true,false,9,0,true,false,0.0,0.0,0.0,0.0,0.0
-2018-01-19-13-42-26,1,1,0,1,3,2,1.0,1,1,1,0,1,3,6,4,11,29,true,false,2,12,true,false,1,true,false,0,0,false,false,5707.990000000001,5707.99,5707.990000000001,5707.990000000001,-44193.0
-2018-01-19-13-42-32,1,1,0,1,3,2,1.0,1,2,1,0,1,3,6,1,3,18,true,false,2,3,true,false,6,true,false,0,0,false,false,128796.79,128796.79,128796.79,128796.79,-380368.0
-2018-01-19-13-42-37,1,1,0,1,3,2,1.0,1,3,1,0,1,3,6,1,3,20,true,false,3,5,true,false,10,true,false,0,0,false,false,305746.44999999995,305746.45,305746.45,305746.44999999995,-388455.0
-2018-01-19-13-42-42,1,1,0,1,3,2,1.0,1,4,1,0,1,3,6,0,4,24,true,false,4,6,true,false,29,true,false,0,0,false,false,155750.37,109479.6,109479.59999999999,109479.59999999999,-548381.0

@@ -1,6 +1,0 @@
-timestamp,topLevelComponents,avgSubComponents,subComponentStdDerivation,componentDepth,implementations,modes,computeResources,nonfunctionalProperties,requests,cpus,seed,genComponents,genImplementations,genConfigurations,modelGeneration,ilp-externalGenerationStart,ilp-externalSolvingStart,ilp-externalValidStart,ilp-externalGenerationHard,ilp-externalSolvingHard,ilp-externalValidHard,ilp-externalGenerationEasy,ilp-externalSolvingEasy,ilp-externalValidEasy,initialObjective,ilp-externalObjectiveStart,ilp-externalObjectiveHard,ilp-externalObjectiveEasy
-2018-01-16-09-44-41,1,1,0,1,1,2,40,1,0,1,0,1,1,2,29,0,0,true,0,0,true,0,0,true,0.0,0.0,0.0,0.0
-2018-01-16-09-44-41,1,1,0,1,1,2,40,1,25,1,0,1,1,2,11,122,279,true,49,185,true,38,145,true,3754269.8699999996,2809811.2,2809811.2,2809811.2
-2018-01-16-09-44-42,1,1,0,1,1,2,40,1,50,1,0,1,1,2,5,86,331,true,69,250,true,104,277,true,8614715.240000002,6382704.29,6382704.29,6382704.29
-2018-01-16-09-44-43,1,1,0,1,1,2,40,1,75,1,0,1,1,2,5,140,505,true,146,739,true,193,579,true,1.1206278750000004E7,7289379.27,7289379.27,7289379.27
-2018-01-16-09-44-45,1,1,0,1,1,2,40,1,100,1,0,1,1,2,6,288,949,true,267,789,true,216,772,true,1.4461749410000008E7,9440690.9,9440690.9,9440690.9

@@ -1,2 +1,0 @@
-timestamp,topLevelComponents,avgSubComponents,subComponentStdDerivation,componentDepth,implementations,modes,computeResources,nonfunctionalProperties,requests,cpus,seed,modelGeneration,ilp-externalGeneration,ilp-externalSolving,ilp-directGeneration,ilp-directSolving,,ilp-externalValid,ilp-directValidinitialObjective,ilp-externalObjective,ilp-directObjective
-2018-01-12-15-14-21,1,1,1,1,1,2,1,1,0,1,0,24,0,0,true,0,0,true,0.0,0.0,0.0

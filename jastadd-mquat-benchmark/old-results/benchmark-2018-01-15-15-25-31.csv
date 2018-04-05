@@ -1,6 +1,0 @@
-timestamp,topLevelComponents,avgSubComponents,subComponentStdDerivation,componentDepth,implementations,modes,computeResources,nonfunctionalProperties,requests,cpus,seed,genComponents,genImplementations,genConfigurations,modelGeneration,ilp-externalGeneration,ilp-externalSolving,ilp-externalValid,initialObjective,ilp-externalObjective
-2018-01-15-15-25-31,1,1,0,1,1,2,40,1,0,1,0,1,1,2,49,0,0,true,0.0,0.0
-2018-01-15-15-25-31,1,1,0,1,1,2,40,1,25,1,0,1,1,2,25,385,180,true,3754269.8699999996,2809811.2
-2018-01-15-15-25-32,1,1,0,1,1,2,40,1,50,1,0,1,1,2,5,74,138,true,8614715.240000002,6382704.29
-2018-01-15-15-25-35,1,1,0,1,1,2,40,1,75,1,0,1,1,2,5,103,299,true,1.1206278750000002E7,7289379.27
-2018-01-15-15-25-43,1,1,0,1,1,2,40,1,100,1,0,1,1,2,4,175,431,true,1.4461749410000002E7,9440690.9
