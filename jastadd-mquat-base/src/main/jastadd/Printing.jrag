@@ -335,7 +335,7 @@ aspect Printing {
   eq Property.print(MquatWriteSettings settings, int indentationLevel) {
     MquatString result = new MquatString(settings, indentationLevel);
 
-    result.append(" property ").append(getName().print(settings, indentationLevel)).append(" [");
+    result.append("property ").append(getName().print(settings, indentationLevel)).append(" [");
     result.append(getUnit()).append("]").lb();
 
     return result;

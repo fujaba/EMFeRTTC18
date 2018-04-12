@@ -26,7 +26,7 @@ import java.util.Scanner;
 @SuppressWarnings("unused")
 public class Main {
 
-  public static final ScenarioDescription SCENARIO_DESCRIPTION = new ScenarioDescription(2, 2, 0, 0, 0, 3, 2, 16, 2, 2, 0);
+  public static final ScenarioDescription SCENARIO_DESCRIPTION = new ScenarioDescription(2, 2, 0, 0, 0, 2, 2, 1.5, 2, 2, 0);
 
   private static File getAbsoluteFileForLoading(String fileName) throws FileNotFoundException {
     URL expUrl = Main.class.getClassLoader().getResource(fileName);
