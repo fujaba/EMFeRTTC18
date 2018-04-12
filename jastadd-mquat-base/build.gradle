@@ -20,8 +20,6 @@ dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.10.0'
 
     testCompile 'junit:junit:4.12'
-    testCompile files('libs/DrAST-1.2.2.jar')
-    testCompile fileTree(dir: "${System.properties['java.home']}", include: '**/jfxrt.jar')
 }
 
 run {
@@ -68,13 +66,6 @@ jar {
 javadoc {
     // this is only run to get the index file etc.
     failOnError = false
-}
-
-task DrAST(type: JavaExec, dependsOn:jar) {
-    group = "verification"
-    description = 'run the DrAST visual debugger tool'
-    classpath = sourceSets.test.runtimeClasspath
-    main = 'de.tudresden.inf.st.mquat.DrAstRunner'
 }
 
 task RagDoll(type: Javadoc, dependsOn:javadoc) {
