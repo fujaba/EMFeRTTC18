@@ -7,11 +7,11 @@ In order to get the case working, perform the following steps:
 - Install GLPK to get the reference implementation working (otherwise the test, and therefore build, will fail)
     - Go to <https://www.gnu.org/software/glpk/> (Linux) or <http://winglpk.sourceforge.net/> (Windows) and follow the instructions
     - Tested with latest version `4.64` of GLPK
-- Clone the repository: `git clone git@git-st.inf.tu-dresden.de:stgroup/ttc18.git && cd ttc18`
-- Verify, that the path to GLPK is correct in `gradle.properties`
+- Clone the repository: `git clone https://git-st.inf.tu-dresden.de/stgroup/ttc18.git && cd ttc18`
+- Verify, that the path to GLPK is correct in `gradle.properties` (and change it, if necessary)
 - Build it: `./gradlew build` (or `gradlew.bat build` on Windows)
 - Run the benchmark: `./gradlew benchmarkFull`
-  	- As this might take long, running a set of scenarios is possible with `./gradlew benchmarkFull -Pscenario=0,small` (comma separated list of ids or names)
+  	- **As this might take long**, running a set of scenarios is possible with `./gradlew benchmarkFull -Pscenario=0,small` (comma separated list of ids and/or names)
     - Alternatively, the timeout can be set to a smaller value in `jastadd-mquat-benchmark/src/main/resources/scenarios.json`
     - Please do not alter the definition of the scenarios, instead use the [Custom Benchmark](#custom-benchmark)
 
@@ -74,4 +74,4 @@ Refer to [`de.tudresden.inf.st.mquat.generator.ScenarioDescription`](https://git
 
 - Please use the gradle wrapper script, as different version of Gradle might not work with the setup
 	- The wrapper script uses version `3.3`
-- If anything is not working as expected, feel free to contact on of the authors of the TTC case or open an [issue](https://git-st.inf.tu-dresden.de/stgroup/ttc18/issues/new)
+- If anything is not working as expected, feel free to contact on of the authors of the TTC case
