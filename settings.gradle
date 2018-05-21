@@ -5,4 +5,6 @@ include ':jastadd-mquat-benchmark'
 include ':jastadd-mquat-solver'
 include ':jastadd-mquat-solver-ilp'
 include ':jastadd-mquat-solver-simple'
+include ':jastadd-mquat-solver-emfer'
+include 'jastadd-mquat-solver-emfer'
 

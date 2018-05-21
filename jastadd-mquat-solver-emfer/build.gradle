@@ -1,0 +1,35 @@
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.10.0'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.10.0'
+    compile project(':jastadd-mquat-base')
+    compile project(':jastadd-mquat-solver')
+    compile "org.eclipse.emf:org.eclipse.emf.ecore:2.9.0-v20130528-0742"
+    compile "org.eclipse.emf:org.eclipse.emf.common:2.9.0-v20130528-0742"
+    // compile "org.eclipse.emf:org.eclipse.emf.ecore.xmi:2.9.0-v20130528-0742"
+    compile files("./libs/libEMFER.jar")
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile project(path: ':jastadd-mquat-solver', configuration: 'testArtifacts')
+}
+group 'de.tudresden.inf.st'
+version '1.0.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
