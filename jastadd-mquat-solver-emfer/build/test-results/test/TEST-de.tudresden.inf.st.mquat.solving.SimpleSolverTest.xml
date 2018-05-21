@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="de.tudresden.inf.st.mquat.solving.SimpleSolverTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2018-05-12T13:31:05" hostname="zuendorf-laptop" time="0.881">
+  <properties/>
+  <testcase name="testSimpleSolver" classname="de.tudresden.inf.st.mquat.solving.SimpleSolverTest" time="0.881"/>
+  <system-out><![CDATA[15:31:05.159 INFO  d.t.i.s.m.s.s.SimpleSolver - found a better solution with an objective of 523393.9.
+15:31:05.201 INFO  d.t.i.s.m.s.s.SimpleSolver - found a better solution with an objective of 523267.42000000004.
+15:31:06.008 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of total software solutions: 1
+15:31:06.009 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of iterated software solutions: 1
+15:31:06.010 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of iterated solutions: 10148
+15:31:06.010 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of correct solutions: 3456
+15:31:06.012 INFO  d.t.i.s.m.s.SimpleSolverTest - the best solution is valid and has an objective of 523267.42000000004.
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
