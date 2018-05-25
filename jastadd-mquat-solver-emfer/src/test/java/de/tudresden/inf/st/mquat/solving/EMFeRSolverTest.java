@@ -27,7 +27,7 @@ public class EMFeRSolverTest {
    * tests the simple solver with one very simple use case
    */
   @Test
-  public void testSimpleSolver() throws SolvingException {
+  public void testEmferSolver() throws SolvingException {
     int tlc = 1;
     int iac = 2;
     int isd = 0;
@@ -38,7 +38,7 @@ public class EMFeRSolverTest {
     int mod = 3;
     double res = 1.5d;
     int nfp = 0;
-    int req = 1;
+    int req = 3;
     int cpu = 1;
     int seed = 0;
 

@@ -8,7 +8,7 @@ import de.tudresden.inf.st.mquat.solving.SolvingException;
 import de.tudresden.inf.st.mquat.utils.StopWatch;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import uniks.ttc18.ECompMapping;
+import uniks.ttc18.EAssignment;
 import uniks.ttc18.ESolution;
 import uniks.ttc18.Ttc18Factory;
 
@@ -90,11 +90,11 @@ public class EMFeRSolver implements BenchmarkableSolver {
 
     EMFeRTrafos emFeRTrafos = new EMFeRTrafos(model);
 
-    emFeRTrafos.createTopLevelMappings(eSolution);
+    emFeRTrafos.createTopLevelAssignments(eSolution);
 
-    for (ECompMapping compMapping : eSolution.getCompMappings())
+    for (EAssignment topAssignment : eSolution.getAssignments())
     {
-      emFeRTrafos.createAssignments(eSolution, compMapping);
+      emFeRTrafos.createSubAssignments(eSolution, topAssignment);
     }
 
     int numAssignments = 0;
@@ -113,7 +113,11 @@ public class EMFeRSolver implements BenchmarkableSolver {
 
     Solution emferSolution = emFeRTrafos.transform(eSolution);
 
+    boolean valid = emferSolution.isValid();
+    // currentSolution = emferSolution;
     //    currentSolution.trace().process(new LoggerProcessor());
+
+    logger.info("emfer found a solution with an objective of {}.", emferSolution.computeObjective());
 
     de.tudresden.inf.st.mquat.jastadd.model.List<Resource> resources = model.getHardwareModel().getResources();
 
@@ -134,7 +138,7 @@ public class EMFeRSolver implements BenchmarkableSolver {
         for (Assignment assignment : assignments) {
           Set<Resource> resourceList = new HashSet<>();
           for (Resource resource : resources) {
-            assignResource(assignment, resource);
+            // assignResource(assignment, resource);
             if (assignment.isValid()) {
               resourceList.add(resource);
             }
