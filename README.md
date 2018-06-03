@@ -34,7 +34,8 @@ The following steps need to be completed:
 1. Add an include of your project to `settings.gradle`
 1. Optional step: Create a test case by extending the [`HandwrittenTestSuite`](https://git-st.inf.tu-dresden.de/stgroup/ttc18/blob/master/jastadd-mquat-solver/src/test/java/de/tudresden/inf/st/mquat/solving/HandwrittenTestSuite.java)
 1. Add a compile dependency to your project in `build.gradle` of the project `jastadd-mquat-benchmark`
-1. Update [`de.tudresden.inf.st.mquat.benchmark.SolverFactory.createAvailableSolversIfNeeded`](https://git-st.inf.tu-dresden.de/stgroup/ttc18/blob/master/jastadd-mquat-benchmark/src/main/java/de/tudresden/inf/st/mquat/benchmark/SolverFactory.java#L22) to create a new instance of your solver
+1. Update [`de.tudresden.inf.st.mquat.benchmark.SolverFactory.createAvailableSolversIfNeeded`]
+   (https://git-st.inf.tu-dresden.de/stgroup/ttc18/blob/master/jastadd-mquat-benchmark/src/main/java/de/tudresden/inf/st/mquat/benchmark/SolverFactory.java#L22) to create a new instance of your solver
 1. Add the name of your solver to the benchmark settings
 	- Use `jastadd-mquat-benchmark/src/main/resources/scenarios.json` for the Gradle task `benchmarkFull`
 	- Use `jastadd-mquat-benchmark/src/main/resources/local-benchmark-settings.json` for the Gralde task `benchmarkCustom` (see [Custom Benchmark](#custom-benchmark) for details)

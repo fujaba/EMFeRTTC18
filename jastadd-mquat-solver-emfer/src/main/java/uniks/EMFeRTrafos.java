@@ -1,12 +1,15 @@
 package uniks;
 
 import de.tudresden.inf.st.mquat.jastadd.model.*;
+import de.tudresden.inf.st.mquat.jastadd.model.List;
 import de.tudresden.inf.st.mquat.solving.SolverUtils;
+import org.eclipse.emf.ecore.EObject;
 import uniks.ttc18.EAssignment;
+import uniks.ttc18.EChoice;
 import uniks.ttc18.ESolution;
 import uniks.ttc18.Ttc18Factory;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class EMFeRTrafos
 {
@@ -37,9 +40,9 @@ public class EMFeRTrafos
          EAssignment topAssignment = Ttc18Factory.eINSTANCE.createEAssignment();
          topAssignment.setRequestName(requName);
          topAssignment.setCompName(targetName.toString());
-         String nodeName = model.getHardwareModel().getResource(resourceNum).getName().toString();
-         resourceNum++;
-         topAssignment.setNodeName(nodeName);
+         // String nodeName = model.getHardwareModel().getResource(resourceNum).getName().toString();
+         // resourceNum++;
+         // topAssignment.setNodeName(nodeName);
          assignments.add(topAssignment);
       }
    }
@@ -71,6 +74,100 @@ public class EMFeRTrafos
 
    }
 
+
+   public Solution transformPartial(ESolution eSolution)
+   {
+      Solution result = new Solution();
+      result.setModel(model);
+
+      // top level
+      for (EAssignment eAssignment : eSolution.getAssignments())
+      {
+         Assignment dAssignment = new Assignment();
+         Request request = findRequest(eAssignment.getRequestName());
+         dAssignment.setRequest(request);
+         dAssignment.setTopLevel(true);
+
+         Component comp = findComp(model, eAssignment.getCompName());
+         Implementation implementation = findImplementation(comp, eAssignment.getImplName());
+         dAssignment.setImplementation(implementation);
+
+         if (eAssignment.getNodeName() == null)
+         {
+            continue;
+         }
+
+         transformPartialSubAssignments(dAssignment, eAssignment, implementation);
+
+         for (Instance instance : implementation.getResourceRequirement().getInstances())
+         {
+            Resource resource =  findResource(eAssignment.getNodeName());
+            ResourceMapping resourceMapping = new ResourceMapping(instance, resource, new List<>());
+
+            SolverUtils.populateResourceMapping(resourceMapping, implementation.getResourceRequirement(), resource);
+
+            dAssignment.setResourceMapping(resourceMapping);
+
+//            if (dAssignment.isValid())
+//            {
+//               System.out.println("assignment is valid " + dAssignment.getImplementation().getName() + " on " + resource.getName());
+//            }
+         }
+
+         result.addAssignment(dAssignment);
+      }
+
+      return result;
+   }
+
+
+   private void transformPartialSubAssignments(Assignment dAssignment, EAssignment eAssignment, Implementation implementation)
+   {
+      for (EAssignment eSubAssignment : eAssignment.getAssignments())
+      {
+         ComponentMapping componentMapping = new ComponentMapping();
+
+         Assignment dSubAssignment = new Assignment();
+         Request request = dAssignment.getRequest();
+         dSubAssignment.setRequest(request);
+         dSubAssignment.setTopLevel(false);
+
+         Component subComp = findComp(model, eSubAssignment.getCompName());
+         Implementation subImpl = findImplementation(subComp, eSubAssignment.getImplName());
+
+         dSubAssignment.setImplementation(subImpl);
+
+         Instance theInstance = findInstance(implementation, "the_" + eSubAssignment.getCompName());
+
+         componentMapping.setInstance(theInstance);
+         componentMapping.setAssignment(dSubAssignment);
+         dAssignment.getComponentMappings().add(componentMapping);
+
+         transformSubAssignments(dSubAssignment, eSubAssignment, subImpl);
+
+         if (eSubAssignment.getNodeName() == null)
+         {
+            continue;
+         }
+
+         for (Instance instance : subImpl.getResourceRequirement().getInstances())
+         {
+            Resource resource = findResource(eSubAssignment.getNodeName());
+            ResourceMapping resourceMapping = new ResourceMapping(instance, resource, new List<>());
+            SolverUtils.populateResourceMapping(resourceMapping, subImpl.getResourceRequirement(), resource);
+            dSubAssignment.setResourceMapping(resourceMapping);
+
+            if (dSubAssignment.isValid())
+            {
+               break;
+            }
+         }
+
+      }
+   }
+
+
+
    ArrayList<Resource> availableResources = null;
 
    public Solution transform(ESolution eSolution)
@@ -97,6 +194,10 @@ public class EMFeRTrafos
 
          Component comp = findComp(model, eAssignment.getCompName());
          Implementation implementation = findImplementation(comp, eAssignment.getImplName());
+         if (implementation == null)
+         {
+            continue;
+         }
          dAssignment.setImplementation(implementation);
 
          transformSubAssignments(dAssignment, eAssignment, implementation);
@@ -139,7 +240,10 @@ public class EMFeRTrafos
 
          Component subComp = findComp(model, eSubAssignment.getCompName());
          Implementation subImpl = findImplementation(subComp, eSubAssignment.getImplName());
-
+         if (subImpl == null)
+         {
+            continue;
+         }
          dSubAssignment.setImplementation(subImpl);
 
          for (Instance instance : subImpl.getResourceRequirement().getInstances())
@@ -233,5 +337,336 @@ public class EMFeRTrafos
          }
       }
       return null;
+   }
+
+   public Collection<EAssignment> getOpenAssignments(ESolution eSolution)
+   {
+      ArrayList<EAssignment> result = new ArrayList<>();
+
+      for (EAssignment eAssignment : eSolution.getAssignments())
+      {
+         if (eAssignment.getImplName() == null)
+         {
+            result.add(eAssignment);
+         }
+
+         getOpenSubAssignments(eAssignment, result);
+      }
+
+      return result;
+   }
+
+   private void getOpenSubAssignments(EAssignment eAssignment, ArrayList<EAssignment> result)
+   {
+      for (EAssignment subAssignment : eAssignment.getAssignments())
+      {
+         if (subAssignment.getImplName() == null)
+         {
+            result.add(subAssignment);
+         }
+
+         getOpenSubAssignments(subAssignment, result);
+      }
+   }
+
+   public Collection<EObject> getImplementationChoices(EObject root)
+   {
+      ArrayList<EObject> result = new ArrayList<>();
+
+      ESolution eSolution = (ESolution) root;
+
+      for (EAssignment eAssignment : getOpenAssignments(eSolution))
+      {
+         Component comp = findComp(model, eAssignment.getCompName());
+
+         for (Implementation dImpl : comp.getImplementations())
+         {
+            EChoice eImpl = Ttc18Factory.eINSTANCE.createEChoice();
+            eImpl.setAssignment(eAssignment);
+            eImpl.setResName(dImpl.getName().toString());
+            result.add(eImpl);
+         }
+
+         return result;
+      }
+
+      return result;
+   }
+
+   public void applyImplementationChoice(EObject root, EObject handle)
+   {
+      EChoice eImpl = (EChoice) handle;
+
+      EAssignment topAssignment = eImpl.getAssignment();
+      topAssignment.setImplName(eImpl.getResName());
+
+      Component comp = findComp(model, topAssignment.getCompName());
+
+      Implementation dImpl = findImplementation(comp, eImpl.getResName());
+
+      for (ComponentRequirement componentRequirement : dImpl.getComponentRequirementList())
+      {
+         String kidCompName = componentRequirement.getComponentRef().getRef().getName().toString();
+
+         EAssignment kidAssignment = Ttc18Factory.eINSTANCE.createEAssignment();
+         kidAssignment.setRequestName(topAssignment.getRequestName());
+         kidAssignment.setCompName(kidCompName);
+
+         topAssignment.getAssignments().add(kidAssignment);
+      }
+   }
+
+   public Collection getComputeNodeChoices(EObject root)
+   {
+      ESolution eSolution = (ESolution) root;
+      ArrayList<EChoice> result = new ArrayList<>();
+
+      // find assignment that is ready to be deployed
+      EAssignment eAssignment = getNextUndeployedAssignment(eSolution);
+
+      if (eAssignment == null)
+      {
+         return result;
+      }
+
+      HashSet<String> alreadInUseComputeNodes = getAlreadInUseComputeNodes(eSolution);
+
+      // loop through all compute nodes
+      for (Resource compNode : model.getHardwareModel().getResourceList())
+      {
+         String compNodeName = compNode.getName().toString();
+
+//         if (alreadInUseComputeNodes.contains(compNodeName))
+//         {
+//            continue;
+//         }
+
+         eAssignment.setNodeName(compNodeName);
+
+         // create dSolution
+         Solution dSolution = transformPartial(eSolution);
+
+
+         // if assignment is valid, add choice
+         boolean allValid = checkAssignments(dSolution);
+
+         if (allValid)
+         {
+            EChoice eChoice = Ttc18Factory.eINSTANCE.createEChoice();
+            eChoice.setAssignment(eAssignment);
+            eChoice.setResName(compNodeName);
+            result.add(eChoice);
+
+//            if (result.size() >= 4)
+//            {
+//               break;
+//            }
+         }
+      }
+
+      eAssignment.setNodeName(null);
+
+      if (result.size() == 0)
+      {
+         System.out.println("did not find hardware for \n" + eAssignment);
+      }
+
+      return result;
+   }
+
+   private boolean checkAssignments(Solution dSolution)
+   {
+      for (Assignment dAssignment : dSolution.getAssignmentList())
+      {
+         if (dAssignment.getResource() != null)
+         {
+            if (dAssignment.isValid())
+            {
+               // check kids
+               checkAssignments(dAssignment);
+            }
+            else
+            {
+               return false;
+            }
+         }
+      }
+
+      return true;
+   }
+
+
+   private boolean checkAssignments(Assignment parent)
+   {
+      for (ComponentMapping componentMapping : parent.getComponentMappingList())
+      {
+         Assignment dAssignment = componentMapping.getAssignment();
+
+         if (dAssignment.getResourceMapping() != null && dAssignment.getResource() != null)
+         {
+            if (dAssignment.isValid())
+            {
+               // check kids
+               checkAssignments(dAssignment);
+            }
+            else
+            {
+               return false;
+            }
+         }
+      }
+
+      return true;
+   }
+
+
+   private EAssignment getNextUndeployedAssignment(ESolution eSolution)
+   {
+      for (EAssignment eAssignment : eSolution.getAssignments())
+      {
+         if ( ! allAssignmentsInTreeHaveAnImplementation(eAssignment))
+         {
+            continue;
+         }
+
+         if (eAssignment.getNodeName() == null)
+         {
+            return eAssignment;
+         }
+
+         EAssignment kid = getNextUndeployedAssignment(eAssignment);
+
+         if (kid != null)
+         {
+            return kid;
+         }
+      }
+
+      return null;
+   }
+
+   private boolean allAssignmentsInTreeHaveAnImplementation(EAssignment eAssignment)
+   {
+      if (eAssignment.getImplName() == null)
+      {
+         return false;
+      }
+
+      for (EAssignment kid : eAssignment.getAssignments())
+      {
+         if (! allAssignmentsInTreeHaveAnImplementation(kid))
+         {
+            return false;
+         }
+      }
+
+      return true;
+   }
+
+   private EAssignment getNextUndeployedAssignment(EAssignment eAssignment)
+   {
+      for (EAssignment kid : eAssignment.getAssignments())
+      {
+         if (kid.getImplName() == null)
+         {
+            continue;
+         }
+
+         if (kid.getNodeName() == null)
+         {
+            return kid;
+         }
+
+         EAssignment grandKid = getNextUndeployedAssignment(kid);
+
+         if (grandKid != null)
+         {
+            return grandKid;
+         }
+      }
+
+      return null;
+   }
+
+
+
+   private HashSet<String> getAlreadInUseComputeNodes(ESolution eSolution)
+   {
+      HashSet<String> result = new HashSet<>();
+
+      for (EAssignment eAssignment : eSolution.getAssignments())
+      {
+         getAlreadInUseComputeNodes(eAssignment, result);
+      }
+
+      return result;
+   }
+
+
+
+      private void getAlreadInUseComputeNodes(EAssignment eAssignment, Set<String> alreadInUseComputeNodes)
+   {
+      if (eAssignment.getNodeName() != null)
+      {
+         alreadInUseComputeNodes.add(eAssignment.getNodeName());
+      }
+
+      for (EAssignment kidAssignment : eAssignment.getAssignments())
+      {
+         getAlreadInUseComputeNodes(kidAssignment, alreadInUseComputeNodes);
+      }
+   }
+
+   private Collection<EAssignment> getNoComputeNodeAssignments(ESolution eSolution)
+   {
+      ArrayList<EAssignment> result = new ArrayList<>();
+
+      for (EAssignment eAssignment : eSolution.getAssignments())
+      {
+         if (eAssignment.getNodeName() == null)
+         {
+            result.add(eAssignment);
+         }
+
+         getOpenSubAssignments(eAssignment, result);
+      }
+
+      return result;
+   }
+
+
+
+   public void assignComputeNode(EObject root, EObject node)
+   {
+      EChoice eChoice = (EChoice) node;
+      eChoice.getAssignment().setNodeName(eChoice.getResName());
+   }
+
+   public double getNumberOfOpenIssues(EObject root)
+   {
+      ESolution eSolution = (ESolution) root;
+
+      int result = 0;
+
+      for (EAssignment eAssignment : eSolution.getAssignments())
+      {
+         result +=  getNumberOfAssignmentOpenIssues(eAssignment);
+      }
+
+      return result;
+   }
+
+   private int getNumberOfAssignmentOpenIssues(EAssignment eAssignment)
+   {
+      int result = 0;
+      if (eAssignment.getImplName() == null) result++;
+      if (eAssignment.getNodeName() == null) result++;
+
+      for (EAssignment kid : eAssignment.getAssignments())
+      {
+         result += getNumberOfAssignmentOpenIssues(kid);
+      }
+
+      return result;
    }
 }

@@ -37,7 +37,7 @@ public class SimpleSolverTest {
     int nfp = 0;
     int req = 3;
     int cpu = 1;
-    int seed = 0;
+    int seed = 1;
 
     ScenarioGenerator generator = new ScenarioGenerator(new ScenarioDescription(tlc, iac, isd, cac, csd, dep, imp, res, req, cpu, seed));
 

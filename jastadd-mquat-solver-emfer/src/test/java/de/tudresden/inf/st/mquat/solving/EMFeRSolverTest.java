@@ -40,11 +40,12 @@ public class EMFeRSolverTest {
     int nfp = 0;
     int req = 3;
     int cpu = 1;
-    int seed = 0;
+    int seed = 1;
 
     ScenarioGenerator generator = new ScenarioGenerator(new ScenarioDescription(tlc, iac, isd, cac, csd, dep, imp, res, req, cpu, seed));
 
     Root model = generator.generate();
+
     EMFeRSolver solver = new EMFeRSolver(20000);
 
     Solution solution = solver.solve(model);
