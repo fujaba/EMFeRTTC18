@@ -2,7 +2,7 @@
   "path": "results",
   "logLevel": "info",
   "solvers": [
-    "ilp-direct",
+//    "ilp-direct",
 //    "ilp-external",
     "emfer",
     "simple"
