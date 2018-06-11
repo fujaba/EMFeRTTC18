@@ -29,18 +29,18 @@ public class EMFeRSolverTest {
   @Test
   public void testEmferSolver() throws SolvingException {
     int tlc = 1;
-    int iac = 2;
+    int iac = 0;
     int isd = 0;
-    int cac = 0;
+    int cac = 2;
     int csd = 0;
-    int dep = 2;
-    int imp = 1;
+    int dep = 5;
+    int imp = 2;
     int mod = 3;
     double res = 1.5d;
     int nfp = 0;
-    int req = 3;
+    int req = 1;
     int cpu = 1;
-    int seed = 1;
+    int seed = 0;
 
     ScenarioGenerator generator = new ScenarioGenerator(new ScenarioDescription(tlc, iac, isd, cac, csd, dep, imp, res, req, cpu, seed));
 

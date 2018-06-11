@@ -8,6 +8,8 @@ import de.tudresden.inf.st.mquat.solving.SolvingException;
 import de.tudresden.inf.st.mquat.utils.StopWatch;
 import emfer.EMFeR;
 import emfer.reachability.ReachableState;
+import emfer.stories.StoryStep;
+import emfer.stories.Storyboard;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.emf.ecore.EDataType;
@@ -102,8 +104,9 @@ public class EMFeRSolver implements BenchmarkableSolver {
 
       EMFeR emfer = new EMFeR()
               .withStart(eSolution)
-              .withMaxNoOfNewStates(100 * 1000)
-              .withMetric(root -> -1 * emFeRTrafos.getNumberOfOpenIssues(root))
+              .withTimeLimit(this.maxSolvingTime / 4 * 3)
+              .withMaxNoOfNewStates(300 * 1000)
+              .withMetric(root -> emFeRTrafos.getNumberOfSolvedIssues(root))
               .withTrafo("choose implementation", root -> emFeRTrafos.getImplementationChoices(root), (root, impl) -> emFeRTrafos.applyImplementationChoice(root, impl))
               .withTrafo("assign node", root -> emFeRTrafos.getComputeNodeChoices(root), (root, node) -> emFeRTrafos.assignComputeNode(root, node))
               ;
@@ -148,6 +151,12 @@ public class EMFeRSolver implements BenchmarkableSolver {
          }
       }
 
+//      Storyboard story = new Storyboard("EmferSolverTest");
+//
+//      printReachableStatesList(emfer, "E_");
+//
+//      story.dumpHtml();
+
       if (bestSolution != null)
       {
          logger.info("emfer found a solution with an objective of {}. Number of complete solutions {} ", bestSolution.computeObjective(), noOfCompleteSolutions );
@@ -157,6 +166,25 @@ public class EMFeRSolver implements BenchmarkableSolver {
 
       return bestSolution;
    }
+
+
+   private void printReachableStatesList(EMFeR emfer, String prefix)
+   {
+      StoryStep step = new StoryStep();
+
+      for (ReachableState s : emfer.getReachabilityGraph().getStates())
+      {
+         StringBuilder buf = new StringBuilder();
+
+         String descr = step.genHtmlStateDescription(s, prefix);
+
+         java.util.logging.Logger.getGlobal().info(descr);
+      }
+   }
+
+
+
+
 
    private boolean isCompleteSolution(ESolution eSolution)
    {

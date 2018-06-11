@@ -7,7 +7,7 @@
     "emfer",
     "simple"
   ],
-  "timeoutValue": 2,
+  "timeoutValue": 15,
   "timeoutUnit": "MINUTES",
   "seed": 0,
 //  "repetitions": 10,

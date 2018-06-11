@@ -15,10 +15,13 @@ dependencies {
     compile "org.eclipse.emf:org.eclipse.emf.ecore:2.9.0-v20130528-0742"
     compile "org.eclipse.emf:org.eclipse.emf.common:2.9.0-v20130528-0742"
     // compile "org.eclipse.emf:org.eclipse.emf.ecore.xmi:2.9.0-v20130528-0742"
-    compile files("./libs/libEMFER.jar")
+    compile files("./libs/libEMFER.jar",
+                  "./libs/org.eclipse.xtext.xbase.lib_2.13.0.v20171020-0659.jar",
+                  "./libs/com.google.guava_21.0.0.v20170206-1425.jar")
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile project(path: ':jastadd-mquat-solver', configuration: 'testArtifacts')
 }
+
 group 'de.tudresden.inf.st'
 version '1.0.0-SNAPSHOT'
 

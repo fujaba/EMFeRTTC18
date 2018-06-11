@@ -143,7 +143,7 @@ public class EMFeRTrafos
          componentMapping.setAssignment(dSubAssignment);
          dAssignment.getComponentMappings().add(componentMapping);
 
-         transformSubAssignments(dSubAssignment, eSubAssignment, subImpl);
+         transformPartialSubAssignments(dSubAssignment, eSubAssignment, subImpl);
 
          if (eSubAssignment.getNodeName() == null)
          {
@@ -381,11 +381,21 @@ public class EMFeRTrafos
 
          for (Implementation dImpl : comp.getImplementations())
          {
+            String implName = dImpl.getName().toString();
+            eAssignment.setImplName(implName);
+//            Collection computeNodeChoices = getComputeNodeChoices(eSolution, eAssignment);
+//            if (computeNodeChoices.size() == 0)
+//            {
+//               continue;
+//            }
+
             EChoice eImpl = Ttc18Factory.eINSTANCE.createEChoice();
             eImpl.setAssignment(eAssignment);
             eImpl.setResName(dImpl.getName().toString());
             result.add(eImpl);
          }
+
+         eAssignment.setImplName(null);
 
          return result;
       }
@@ -429,6 +439,24 @@ public class EMFeRTrafos
          return result;
       }
 
+      getComputeNodeChoices(eSolution, result, eAssignment);
+
+      return result;
+   }
+
+
+   private Collection getComputeNodeChoices(ESolution eSolution, EAssignment eAssignment)
+   {
+      ArrayList<EChoice> result = new ArrayList<>();
+
+      getComputeNodeChoices(eSolution, result, eAssignment);
+
+      return result;
+   }
+
+
+   private void getComputeNodeChoices(ESolution eSolution, ArrayList<EChoice> result, EAssignment eAssignment)
+   {
       HashSet<String> alreadInUseComputeNodes = getAlreadInUseComputeNodes(eSolution);
 
       // loop through all compute nodes
@@ -448,7 +476,7 @@ public class EMFeRTrafos
 
 
          // if assignment is valid, add choice
-         boolean allValid = checkAssignments(dSolution);
+         boolean allValid = checkAssignments(dSolution, eAssignment.getImplName());
 
          if (allValid)
          {
@@ -466,57 +494,56 @@ public class EMFeRTrafos
 
       eAssignment.setNodeName(null);
 
-      if (result.size() == 0)
-      {
-         System.out.println("did not find hardware for \n" + eAssignment);
-      }
-
-      return result;
+//      if (result.size() == 0)
+//      {
+//         System.out.println("did not find hardware for \n" + eAssignment);
+//      }
    }
 
-   private boolean checkAssignments(Solution dSolution)
+   private boolean checkAssignments(Solution dSolution, String implName)
    {
       for (Assignment dAssignment : dSolution.getAssignmentList())
       {
-         if (dAssignment.getResource() != null)
+         if (dAssignment.getImplementation().getName().toString().equals(implName))
          {
-            if (dAssignment.isValid())
+            try
             {
-               // check kids
-               checkAssignments(dAssignment);
+               return dAssignment.isValid();
             }
-            else
+            catch (Exception e)
             {
                return false;
             }
          }
+               // check kids
+         if (checkAssignments(dAssignment, implName))
+         {
+            return true;
+         }
       }
 
-      return true;
+      return false;
    }
 
 
-   private boolean checkAssignments(Assignment parent)
+   private boolean checkAssignments(Assignment parent, String implName)
    {
       for (ComponentMapping componentMapping : parent.getComponentMappingList())
       {
          Assignment dAssignment = componentMapping.getAssignment();
 
-         if (dAssignment.getResourceMapping() != null && dAssignment.getResource() != null)
+         if (dAssignment.getImplementation().getName().toString().equals(implName))
          {
-            if (dAssignment.isValid())
-            {
-               // check kids
-               checkAssignments(dAssignment);
-            }
-            else
-            {
-               return false;
-            }
+            return dAssignment.isValid();
+         }
+
+         if (checkAssignments(dAssignment, implName))
+         {
+            return true;
          }
       }
 
-      return true;
+      return false;
    }
 
 
@@ -641,6 +668,36 @@ public class EMFeRTrafos
       EChoice eChoice = (EChoice) node;
       eChoice.getAssignment().setNodeName(eChoice.getResName());
    }
+
+
+   public double getNumberOfSolvedIssues(EObject root)
+   {
+      ESolution eSolution = (ESolution) root;
+
+      int result = 0;
+
+      for (EAssignment eAssignment : eSolution.getAssignments())
+      {
+         result +=  getNumberOfAssignmentSolvedIssues(eAssignment);
+      }
+
+      return result;
+   }
+
+   private int getNumberOfAssignmentSolvedIssues(EAssignment eAssignment)
+   {
+      int result = 0;
+      if (eAssignment.getImplName() != null) result++;
+      if (eAssignment.getNodeName() != null) result++;
+
+      for (EAssignment kid : eAssignment.getAssignments())
+      {
+         result += getNumberOfAssignmentSolvedIssues(kid);
+      }
+
+      return result;
+   }
+
 
    public double getNumberOfOpenIssues(EObject root)
    {
