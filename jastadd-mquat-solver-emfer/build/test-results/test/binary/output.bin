@@ -1,150 +1,0 @@
-'Loading model DSL file 'test_01.txt'.
-i15:31:04.744 INFO  d.t.i.s.m.s.s.SimpleSolver - found a better solution with an objective of 292427.44.
-W15:31:04.751 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of total software solutions: 6
-Z15:31:04.751 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of iterated software solutions: 4
-Q15:31:04.752 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of iterated solutions: 3
-P15:31:04.753 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of correct solutions: 1
-@15:31:04.756 DEBUG d.t.i.s.m.s.HandwrittenTestSuite - Solution:
-solution {
- request0 -> config_0i0m0 {
-  compute_resource_0 -> r0 {
-   cpu_1 -> cpu0_0
-  }
-  other -> config_1i0m0 {
-   compute_resource_0 -> r1 {
-    cpu_1 -> cpu1_0
-   }
-  }
- }
-}
-
-'Loading model DSL file 'test_02.txt'.
-i15:31:04.772 INFO  d.t.i.s.m.s.s.SimpleSolver - found a better solution with an objective of 292391.04.
-W15:31:04.774 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of total software solutions: 6
-Z15:31:04.774 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of iterated software solutions: 4
-Q15:31:04.777 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of iterated solutions: 3
-P15:31:04.777 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of correct solutions: 1
-@15:31:04.778 DEBUG d.t.i.s.m.s.HandwrittenTestSuite - Solution:
-solution {
- request0 -> config_0i0m0 {
-  compute_resource_0 -> r0 {
-   cpu_1 -> cpu0_0
-  }
-  other -> config_1i0m0 {
-   compute_resource_0 -> r1 {
-    cpu_1 -> cpu1_0
-   }
-  }
- }
-}
-
-'Loading model DSL file 'test_03.txt'.
-i15:31:04.804 INFO  d.t.i.s.m.s.s.SimpleSolver - found a better solution with an objective of 324731.04.
-X15:31:04.829 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of total software solutions: 18
-Z15:31:04.829 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of iterated software solutions: 8
-Q15:31:04.830 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of iterated solutions: 9
-P15:31:04.832 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of correct solutions: 1
-@15:31:04.833 DEBUG d.t.i.s.m.s.HandwrittenTestSuite - Solution:
-solution {
- request0 -> config_0i0m0 {
-  compute_resource_0 -> r0 {
-   cpu_1 -> cpu0_0
-  }
-  other -> config_1i0m0 {
-   compute_resource_0 -> r1 {
-    cpu_1 -> cpu1_0
-   }
-  }
- }
- request1 -> config_1i0m0 {
-  compute_resource_0 -> r2 {
-   cpu_1 -> cpu2_0
-  }
- }
-}
-
-'Loading model DSL file 'test_04.txt'.
-r15:31:04.850 INFO  d.t.i.s.m.s.s.SimpleSolver - found a better solution with an objective of 375166.51999999996.
-X15:31:04.856 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of total software solutions: 12
-Z15:31:04.857 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of iterated software solutions: 8
-Q15:31:04.857 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of iterated solutions: 9
-P15:31:04.858 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of correct solutions: 1
-@15:31:04.860 DEBUG d.t.i.s.m.s.HandwrittenTestSuite - Solution:
-solution {
- request0 -> config_0i0m0 {
-  compute_resource_0 -> r0 {
-   cpu_1 -> cpu0_0
-  }
-  alpha -> config_1i0m0 {
-   compute_resource_0 -> r1 {
-    cpu_1 -> cpu1_0
-   }
-  }
-  beta -> config_2i0m0 {
-   compute_resource_0 -> r2 {
-    cpu_1 -> cpu2_0
-   }
-  }
- }
-}
-
-'Loading model DSL file 'test_05.txt'.
-q15:31:04.890 INFO  d.t.i.s.m.s.s.SimpleSolver - found a better solution with an objective of 396486.6599999999.
-q15:31:04.892 INFO  d.t.i.s.m.s.s.SimpleSolver - found a better solution with an objective of 396308.6599999999.
-r15:31:04.894 INFO  d.t.i.s.m.s.s.SimpleSolver - found a better solution with an objective of 23665.660000000003.
-r15:31:04.897 INFO  d.t.i.s.m.s.s.SimpleSolver - found a better solution with an objective of 23042.660000000003.
-r15:31:04.899 INFO  d.t.i.s.m.s.s.SimpleSolver - found a better solution with an objective of 22864.660000000003.
-r15:31:04.910 INFO  d.t.i.s.m.s.s.SimpleSolver - found a better solution with an objective of 22699.660000000003.
-h15:31:04.925 INFO  d.t.i.s.m.s.s.SimpleSolver - found a better solution with an objective of 22097.66.
-h15:31:04.930 INFO  d.t.i.s.m.s.s.SimpleSolver - found a better solution with an objective of 21919.66.
-h15:31:05.002 INFO  d.t.i.s.m.s.s.SimpleSolver - found a better solution with an objective of 21885.66.
-Y15:31:05.058 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of total software solutions: 192
-Z15:31:05.059 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of iterated software solutions: 8
-T15:31:05.061 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of iterated solutions: 1584
-R15:31:05.062 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of correct solutions: 360
-@15:31:05.067 DEBUG d.t.i.s.m.s.HandwrittenTestSuite - Solution:
-solution {
- request0 -> configA0 {
-  compute_resource_0 -> r0 {
-   cpu_1 -> cpu0_0
-  }
-  beta -> configB0 {
-   compute_resource_0 -> r1 {
-    cpu_1 -> cpu1_0
-   }
-   chi -> configC0 {
-    compute_resource_0 -> r4 {
-     cpu_1 -> cpu0_0
-    }
-   }
-   delta -> configD0 {
-    compute_resource_0 -> r3 {
-     cpu_1 -> cpu0_0
-    }
-   }
-  }
-  epsilon -> configE0 {
-   compute_resource_0 -> r2 {
-    cpu_1 -> cpu2_0
-   }
-   phi -> configF0 {
-    compute_resource_0 -> r5 {
-     cpu_1 -> cpu0_0
-    }
-   }
-   gamma -> configG0 {
-    compute_resource_0 -> r6 {
-     cpu_1 -> cpu0_0
-    }
-   }
-  }
- }
-}
-
-h15:31:05.159 INFO  d.t.i.s.m.s.s.SimpleSolver - found a better solution with an objective of 523393.9.
-r15:31:05.201 INFO  d.t.i.s.m.s.s.SimpleSolver - found a better solution with an objective of 523267.42000000004.
-W15:31:06.008 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of total software solutions: 1
-Z15:31:06.009 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of iterated software solutions: 1
-U15:31:06.010 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of iterated solutions: 10148
-S15:31:06.010 INFO  d.t.i.s.m.s.s.SimpleSolver - Number of correct solutions: 3456
-z15:31:06.012 INFO  d.t.i.s.m.s.SimpleSolverTest - the best solution is valid and has an objective of 523267.42000000004.

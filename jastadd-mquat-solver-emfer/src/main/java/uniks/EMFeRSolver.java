@@ -163,8 +163,9 @@ public class EMFeRSolver implements BenchmarkableSolver {
       }
 
       lastSolvingTime = stopWatch.time(TimeUnit.MILLISECONDS);
+      lastSolution = bestSolution;
 
-      return bestSolution;
+      return lastSolution;
    }
 
 
